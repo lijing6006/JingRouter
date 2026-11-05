@@ -521,12 +521,14 @@ func registerCNProviderRoutes(admin *gin.RouterGroup, h *handler.Handlers) {
 	}
 }
 
-// registerWorkbuddyRoutes 注册 WorkBuddy 账号额度查询端点（数据来自本地 Magpie 网关）。
+// registerWorkbuddyRoutes 注册 WorkBuddy 账号额度查询与签到端点（数据来自本地 Magpie 网关）。
 func registerWorkbuddyRoutes(admin *gin.RouterGroup, h *handler.Handlers) {
 	wb := admin.Group("/workbuddy")
 	{
 		// 全部 WorkBuddy 账号的额度快照（账号、套餐、各额度窗口的已用/剩余/上限/到期时间）。
 		wb.GET("/accounts", h.Admin.Workbuddy.ListAccounts)
+		// 触发一次 Magpie WorkBuddy 签到（覆盖全部已开启的账号，幂等）。
+		wb.POST("/checkin", h.Admin.Workbuddy.Checkin)
 	}
 }
 

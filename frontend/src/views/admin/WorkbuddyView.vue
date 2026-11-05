@@ -21,6 +21,16 @@
             </p>
           </div>
           <div class="flex flex-shrink-0 items-center gap-2">
+            <a
+              href="https://wk.jingrouer.top"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn btn-secondary"
+              :title="t('admin.workbuddy.addAccountHint')"
+            >
+              <Icon name="userPlus" size="sm" />
+              {{ t('admin.workbuddy.addAccount') }}
+            </a>
             <button
               type="button"
               class="btn btn-primary"
@@ -86,6 +96,39 @@
           />
         </div>
 
+        <!-- Check-in result -->
+        <div
+          v-if="checkinResult || checkinError"
+          class="rounded-3xl border px-5 py-4 text-sm"
+          :class="checkinError
+            ? 'border-red-200 bg-red-50 text-red-800 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-200'
+            : 'border-emerald-200 bg-emerald-50 text-emerald-900 dark:border-emerald-900/60 dark:bg-emerald-950/30 dark:text-emerald-100'"
+        >
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <p class="font-medium">
+                {{ checkinError ? t('admin.workbuddy.checkinFailed') : t('admin.workbuddy.checkinDone') }}
+              </p>
+              <p v-if="checkinError" class="mt-1">{{ checkinError }}</p>
+              <ul v-else-if="checkinResult && checkinResult.length > 0" class="mt-1 space-y-0.5">
+                <li v-for="r in checkinResult" :key="r.user || r.day">
+                  <span class="font-medium">{{ r.user || '—' }}</span>：{{ checkinOutcomeText(r) }}
+                </li>
+              </ul>
+              <p v-else-if="checkinResult" class="mt-1">{{ t('admin.workbuddy.checkinNoAccounts') }}</p>
+              <p class="mt-1.5 text-xs opacity-75">{{ t('admin.workbuddy.checkinCoversAll') }}</p>
+            </div>
+            <button
+              type="button"
+              class="flex-shrink-0 rounded-lg px-2 py-0.5 text-base leading-none opacity-60 hover:opacity-100"
+              :aria-label="t('common.close')"
+              @click="checkinResult = null; checkinError = ''"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+
         <!-- One detail card per account -->
         <section
           v-for="account in accounts"
@@ -112,6 +155,22 @@
               {{ t('admin.workbuddy.totalCredits') }}:
               {{ totalCreditsOf(account)?.display || '—' }}
             </span>
+            <span
+              class="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700 dark:bg-dark-700 dark:text-gray-300"
+              :title="t('admin.workbuddy.totalTokensEstHint')"
+            >
+              {{ t('admin.workbuddy.totalTokensEst') }}: {{ formatTokens(totalTokensOf(account)) }}
+            </span>
+            <button
+              type="button"
+              class="inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-medium text-blue-600 transition-colors hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50 dark:text-blue-400 dark:hover:bg-blue-900/30"
+              :disabled="checkingIn"
+              :title="t('admin.workbuddy.checkinHint')"
+              @click="handleCheckin"
+            >
+              <Icon :name="checkingIn ? 'refresh' : 'check'" size="xs" :class="checkingIn ? 'animate-spin' : ''" />
+              {{ checkingIn ? t('admin.workbuddy.checkingIn') : t('admin.workbuddy.checkin') }}
+            </button>
             <span class="text-xs text-gray-400 dark:text-gray-500">
               {{ account.read_at ? formatDateTime(account.read_at) : '' }}
             </span>
@@ -169,7 +228,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { adminAPI } from '@/api/admin'
-import type { WorkbuddyQuotaAccount, WorkbuddyQuotaWindow } from '@/api/admin/workbuddy'
+import type { WorkbuddyCheckinResult, WorkbuddyQuotaAccount, WorkbuddyQuotaWindow } from '@/api/admin/workbuddy'
 import { extractApiErrorMessage } from '@/utils/apiError'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import StatCard from '@/components/common/StatCard.vue'
@@ -182,6 +241,9 @@ const accounts = ref<WorkbuddyQuotaAccount[]>([])
 const fetchedAt = ref(0)
 const loading = ref(false)
 const error = ref('')
+const checkingIn = ref(false)
+const checkinResult = ref<WorkbuddyCheckinResult[] | null>(null)
+const checkinError = ref('')
 
 function isTotalCredits(row: WorkbuddyQuotaWindow): boolean {
   return row.name === 'Total credits'
@@ -189,6 +251,24 @@ function isTotalCredits(row: WorkbuddyQuotaWindow): boolean {
 
 function totalCreditsOf(account: WorkbuddyQuotaAccount): WorkbuddyQuotaWindow | undefined {
   return account.windows.find((w) => w.name === 'Total credits')
+}
+
+/**
+ * 该账号累计 Tokens（估算）= 名字含 "tokens" 的各模型估算窗口 amount 之和。
+ * amount 是各模型 tokens 估算的已用量（单位即 token 数）；没有这类窗口时为 0。
+ * 这只是估算窗口的加总，不是 Magpie 的官方口径，展示时标注“估算”。
+ */
+function totalTokensOf(account: WorkbuddyQuotaAccount): number {
+  return account.windows.reduce((sum, w) => {
+    if (!/tokens/i.test(w.name)) return sum
+    return sum + (w.amount ?? 0)
+  }, 0)
+}
+
+/** Token 数格式化：取整 + 千分位。 */
+function formatTokens(value: number): string {
+  if (!Number.isFinite(value)) return '—'
+  return Math.round(value).toLocaleString()
 }
 
 /**
@@ -263,6 +343,51 @@ function expiryLabel(row: WorkbuddyQuotaWindow): string {
   const raw = row.resets_at || row.runs_out_at || ''
   if (!raw) return t('admin.workbuddy.noExpiry')
   return `${t('admin.workbuddy.expiresShort')} ${formatDateTime(raw)}`
+}
+
+/** 单个账号签到结果的展示文案。 */
+function checkinOutcomeText(r: WorkbuddyCheckinResult): string {
+  switch (r.outcome) {
+    case 'claimed':
+      return (
+        t('admin.workbuddy.checkinClaimed', { credit: formatTokens(r.credit ?? 0) }) +
+        (r.streak ? ` · ${t('admin.workbuddy.checkinStreak', { n: r.streak })}` : '')
+      )
+    case 'done':
+      return t('admin.workbuddy.checkinAlreadyDone')
+    case 'ineligible':
+      return t('admin.workbuddy.checkinIneligible')
+    case 'inactive':
+      return t('admin.workbuddy.checkinInactive')
+    case 'captcha':
+      return t('admin.workbuddy.checkinCaptcha')
+    case 'own-app':
+      return t('admin.workbuddy.checkinOwnApp')
+    default:
+      return r.msg || t('admin.workbuddy.checkinFailed')
+  }
+}
+
+/**
+ * 触发一次 Magpie WorkBuddy 签到。注意：这是覆盖全部已开启账号的一次签到，
+ * 不是只签当前卡片那个号；当天已签过的返回 done。签完自动刷新一次额度。
+ * 防重复点击：签到进行中所有卡片的按钮都禁用。
+ */
+async function handleCheckin(): Promise<void> {
+  if (checkingIn.value) return
+  checkingIn.value = true
+  checkinError.value = ''
+  checkinResult.value = null
+  try {
+    checkinResult.value = await adminAPI.workbuddy.checkinWorkbuddyAccounts()
+  } catch (err) {
+    checkinError.value = extractApiErrorMessage(err, t('admin.workbuddy.checkinFailed'), {
+      WORKBUDDY_CHECKIN_NOT_CONFIGURED: t('admin.workbuddy.checkinNotConfigured'),
+    })
+  } finally {
+    checkingIn.value = false
+    await loadAccounts()
+  }
 }
 
 async function loadAccounts(): Promise<void> {

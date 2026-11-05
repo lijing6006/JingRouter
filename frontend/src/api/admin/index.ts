@@ -118,7 +118,7 @@ export {
 export default adminAPI
 
 // Re-export types used by components
-export type { WorkbuddyQuotaWindow, WorkbuddyQuotaAccount, WorkbuddyQuotaResult } from './workbuddy'
+export type { WorkbuddyQuotaWindow, WorkbuddyQuotaAccount, WorkbuddyQuotaResult, WorkbuddyCheckinResult } from './workbuddy'
 export type { AuditLog, AuditLogQuery, AuditLogListResponse } from './audit'
 export type { BalanceHistoryItem } from './users'
 export type { ErrorPassthroughRule, CreateRuleRequest, UpdateRuleRequest } from './errorPassthrough'

@@ -981,15 +981,20 @@ const (
 	ImageConcurrencyOverflowModeWait   = "wait"
 )
 
-// MagpieConfig 本地 Magpie 网关的连接配置（WorkBuddy 账号额度查询用）。
+// MagpieConfig 本地 Magpie 网关的连接配置（WorkBuddy 账号额度查询与签到用）。
 //
 //   - base_url: Magpie 网关地址（默认 https://wk.jingrouer.top），环境变量 MAGPIE_BASE_URL
 //   - gateway_key: Magpie 网关密钥（无默认值，环境变量 MAGPIE_GATEWAY_KEY）；
 //     未配置时 WorkBuddy 额度接口返回 503。密钥只在后端调 Magpie 接口时放进
 //     Authorization 请求头，绝不写入日志、不返回给前端。
+//   - web_key: Magpie Web 界面密钥（无默认值，环境变量 MAGPIE_WEB_KEY）；
+//     仅用于调 Magpie Web UI 的签到接口（POST /api/usage/plugin-checkin），
+//     以 Cookie（magpie_web_3430）方式发送，未配置时签到接口返回 503。
+//     同样只在后端使用，绝不写入日志、不返回给前端。
 type MagpieConfig struct {
 	BaseURL    string `mapstructure:"base_url"`
 	GatewayKey string `mapstructure:"gateway_key"`
+	WebKey     string `mapstructure:"web_key"`
 }
 
 // GatewayConfig API网关相关配置
@@ -2061,6 +2066,9 @@ func setDefaults() {
 	viper.SetDefault("magpie.base_url", "https://wk.jingrouer.top")
 	// 注册 magpie.gateway_key（零值），否则 AutomaticEnv 读不到 MAGPIE_GATEWAY_KEY，见 setEnvReachableDefaults。
 	viper.SetDefault("magpie.gateway_key", "")
+	// 注册 magpie.web_key（零值），否则 AutomaticEnv 读不到 MAGPIE_WEB_KEY（同上）。
+	// web_key 只用于调 Magpie Web UI 的签到接口，未配置时签到接口返回 503。
+	viper.SetDefault("magpie.web_key", "")
 	viper.SetDefault("simple_mode.auto_create_default_groups", true)
 	viper.SetDefault("simple_mode_key_rate_limit_enabled", false)
 
