@@ -88,6 +88,10 @@ type Config struct {
 	RateLimit               RateLimitConfig               `mapstructure:"rate_limit"`
 	Pricing                 PricingConfig                 `mapstructure:"pricing"`
 	Gateway                 GatewayConfig                 `mapstructure:"gateway"`
+	// Magpie 是本地 AI 网关（WorkBuddy 账号的额度来源）。base_url 与 gateway_key
+	// 均可由环境变量 MAGPIE_BASE_URL / MAGPIE_GATEWAY_KEY 覆盖；gateway_key
+	// 只在后端使用，绝不返回给前端。
+	Magpie                  MagpieConfig                 `mapstructure:"magpie"`
 	APIKeyAuth              APIKeyAuthCacheConfig         `mapstructure:"api_key_auth_cache"`
 	APIKeyCreate            APIKeyCreateConfig            `mapstructure:"api_key_create"`
 	SubscriptionCache       SubscriptionCacheConfig       `mapstructure:"subscription_cache"`
@@ -976,6 +980,17 @@ const (
 	ImageConcurrencyOverflowModeReject = "reject"
 	ImageConcurrencyOverflowModeWait   = "wait"
 )
+
+// MagpieConfig 本地 Magpie 网关的连接配置（WorkBuddy 账号额度查询用）。
+//
+//   - base_url: Magpie 网关地址（默认 https://wk.jingrouer.top），环境变量 MAGPIE_BASE_URL
+//   - gateway_key: Magpie 网关密钥（无默认值，环境变量 MAGPIE_GATEWAY_KEY）；
+//     未配置时 WorkBuddy 额度接口返回 503。密钥只在后端调 Magpie 接口时放进
+//     Authorization 请求头，绝不写入日志、不返回给前端。
+type MagpieConfig struct {
+	BaseURL    string `mapstructure:"base_url"`
+	GatewayKey string `mapstructure:"gateway_key"`
+}
 
 // GatewayConfig API网关相关配置
 type GatewayConfig struct {
@@ -2041,6 +2056,11 @@ func configureConfigSource(setConfigFile, addConfigPath func(string)) {
 func setDefaults() {
 	viper.SetDefault("run_mode", RunModeStandard)
 	viper.SetDefault("gateway.min_output_tokens", 128)
+
+	// Magpie 网关（WorkBuddy 账号额度查询）。gateway_key 无默认值，必须由环境变量提供。
+	viper.SetDefault("magpie.base_url", "https://wk.jingrouer.top")
+	// 注册 magpie.gateway_key（零值），否则 AutomaticEnv 读不到 MAGPIE_GATEWAY_KEY，见 setEnvReachableDefaults。
+	viper.SetDefault("magpie.gateway_key", "")
 	viper.SetDefault("simple_mode.auto_create_default_groups", true)
 	viper.SetDefault("simple_mode_key_rate_limit_enabled", false)
 

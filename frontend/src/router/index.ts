@@ -526,6 +526,18 @@ const routes: RouteRecordRaw[] = [
     }
   },
   {
+    path: '/admin/workbuddy',
+    name: 'AdminWorkbuddy',
+    component: () => import('@/views/admin/WorkbuddyView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: true,
+      title: 'WorkBuddy Accounts',
+      titleKey: 'admin.workbuddy.title',
+      descriptionKey: 'admin.workbuddy.description'
+    }
+  },
+  {
     path: '/admin/plugins',
     name: 'AdminPlugins',
     component: () => import('@/views/admin/PluginsView.vue'),
