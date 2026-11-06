@@ -112,7 +112,7 @@ onBeforeUnmount(() => {
     <!-- Trigger Icon -->
     <slot name="trigger">
       <svg
-        class="h-4 w-4 cursor-help text-gray-400 transition-colors hover:text-primary-600 dark:text-gray-500 dark:hover:text-primary-400"
+        class="h-4 w-4 cursor-help text-[#a89279] transition-colors duration-500 hover:text-[#4f6b5e] dark:text-[#c9a88c] dark:hover:text-[#9ab5a6]"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -134,7 +134,7 @@ onBeforeUnmount(() => {
         v-show="show"
         role="tooltip"
         :class="[
-          'fixed z-[99999] -translate-x-1/2 -translate-y-full rounded-lg bg-gray-900 p-3 text-xs leading-relaxed text-white shadow-xl ring-1 ring-white/10 selection:bg-primary-200 selection:text-gray-900 before:absolute before:inset-x-0 before:top-full before:h-3 dark:bg-gray-800 dark:selection:bg-primary-200 dark:selection:text-gray-900',
+          'fixed z-[99999] -translate-x-1/2 -translate-y-full rounded-sm border border-[#d4cdc5]/40 bg-white p-3 text-xs font-light leading-relaxed text-[#3d3d3d] shadow-md selection:bg-[#5a7a6b]/20 selection:text-[#3d3d3d] before:absolute before:inset-x-0 before:top-full before:h-3 dark:border-[#4a4540] dark:bg-[#2f2d2a] dark:text-[#ede7e0] dark:selection:bg-[#9ab5a6]/25 dark:selection:text-[#ede7e0]',
           props.widthClass,
         ]"
         :style="{ top: `calc(${tooltipStyle.top} - 8px)`, left: tooltipStyle.left }"
@@ -143,7 +143,7 @@ onBeforeUnmount(() => {
         <button
           v-if="props.trigger === 'click'"
           type="button"
-          class="absolute right-1.5 top-1.5 rounded p-1 text-gray-300 transition-colors hover:bg-white/10 hover:text-white"
+          class="absolute right-1.5 top-1.5 rounded-sm p-1 text-[#756554] transition-colors duration-500 hover:bg-[#d4cdc5]/25 hover:text-[#3d3d3d] dark:text-[#c9a88c] dark:hover:bg-[#3a3733] dark:hover:text-[#ede7e0]"
           aria-label="Close"
           @click.stop="closeTooltip"
         >
@@ -152,7 +152,7 @@ onBeforeUnmount(() => {
           </svg>
         </button>
         <slot>{{ content }}</slot>
-        <div class="absolute -bottom-1 left-1/2 h-2 w-2 -translate-x-1/2 rotate-45 bg-gray-900 dark:bg-gray-800"></div>
+        <div class="absolute -bottom-1 left-1/2 h-2 w-2 -translate-x-1/2 rotate-45 border-b border-r border-[#d4cdc5]/40 bg-white dark:border-[#4a4540] dark:bg-[#2f2d2a]"></div>
       </div>
     </Teleport>
   </div>

@@ -2,7 +2,7 @@
   <div v-if="entry.status === 'idle'" class="mt-0.5 text-xs">
     <button
       type="button"
-      class="text-primary-600 underline decoration-dashed underline-offset-2 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+      class="text-[#4f6b5e] underline decoration-dashed underline-offset-2 transition-colors duration-500 hover:text-[#3d3d3d] dark:text-[#9ab5a6] dark:hover:text-[#b6cddd]"
       @click="handleFetch"
     >
       {{ t('usage.ipGeo.fetch') }}
@@ -11,7 +11,7 @@
 
   <div
     v-else-if="entry.status === 'loading'"
-    class="mt-0.5 flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500"
+    class="mt-0.5 flex items-center gap-1 text-xs font-extralight text-[#756554] dark:text-[#c9a88c]"
   >
     <svg class="h-3 w-3 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path
@@ -27,7 +27,7 @@
   <div v-else-if="entry.status === 'success'" class="mt-0.5 flex items-center gap-1 text-xs">
     <button
       type="button"
-      class="truncate text-gray-500 underline decoration-dotted underline-offset-2 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400"
+      class="truncate text-[#756554] underline decoration-dotted underline-offset-2 transition-colors duration-500 hover:text-[#4f6b5e] dark:text-[#c9a88c] dark:hover:text-[#9ab5a6]"
       :title="tooltipText"
       @click="handleOpenDetail"
     >
@@ -35,7 +35,7 @@
     </button>
     <button
       type="button"
-      class="text-gray-400 hover:text-primary-600 dark:hover:text-primary-400"
+      class="text-[#a89279] transition-colors duration-500 hover:text-[#4f6b5e] dark:text-[#c9a88c] dark:hover:text-[#9ab5a6]"
       :title="t('usage.ipGeo.refreshTitle')"
       @click="handleRefresh"
     >
@@ -46,14 +46,14 @@
   <div v-else-if="entry.status === 'error'" class="mt-0.5 text-xs">
     <button
       type="button"
-      class="text-red-600 underline decoration-dashed underline-offset-2 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+      class="text-[#8b5e52] underline decoration-dashed underline-offset-2 transition-colors duration-500 hover:text-[#756554] dark:text-[#c99b90] dark:hover:text-[#c9a88c]"
       @click="handleFetch"
     >
       {{ t('usage.ipGeo.failed') }}
     </button>
   </div>
 
-  <div v-else class="mt-0.5 text-xs text-gray-400 dark:text-gray-500">
+  <div v-else class="mt-0.5 text-xs font-extralight text-[#756554] dark:text-[#c9a88c]">
     {{ t('usage.ipGeo.private') }}
   </div>
 </template>

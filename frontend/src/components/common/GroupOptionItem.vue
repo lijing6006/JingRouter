@@ -16,7 +16,7 @@
       <!-- Row 2: description with top spacing -->
       <span
         v-if="description"
-        class="mt-1.5 w-full whitespace-pre-line [overflow-wrap:anywhere] text-left text-xs leading-relaxed text-gray-500 dark:text-gray-400 line-clamp-3"
+        class="mt-1.5 w-full whitespace-pre-line [overflow-wrap:anywhere] text-left text-xs font-light leading-relaxed text-[#756554] dark:text-[#c9a88c] line-clamp-3"
       >
         {{ description }}
       </span>
@@ -26,10 +26,10 @@
     <div class="flex shrink-0 items-center gap-2 pt-0.5">
       <div class="flex shrink-0 flex-col items-end gap-1">
         <!-- Rate pill (platform color) -->
-        <span v-if="rateMultiplier !== undefined" :class="['inline-flex items-center whitespace-nowrap rounded-full px-3 py-1 text-xs font-semibold', ratePillClass]">
+        <span v-if="rateMultiplier !== undefined" :class="['inline-flex items-center whitespace-nowrap rounded-sm px-3 py-1 text-xs font-light', ratePillClass]">
           <template v-if="hasCustomRate">
             <span class="mr-1 line-through opacity-50">{{ rateMultiplier }}x</span>
-            <span class="font-bold">{{ userRateMultiplier }}x</span>
+            <span class="font-light">{{ userRateMultiplier }}x</span>
           </template>
           <template v-else>
             {{ rateMultiplier }}x {{ t('admin.groups.rateLabel') }}
@@ -37,7 +37,7 @@
         </span>
         <span
           v-if="hasPeakRate"
-          class="inline-flex items-center whitespace-nowrap rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700 dark:bg-amber-900/20 dark:text-amber-300"
+          class="inline-flex items-center whitespace-nowrap rounded-sm bg-[#c9a88c]/10 px-3 py-1 text-xs font-light text-[#756554] dark:bg-[#c9a88c]/10 dark:text-[#c9a88c]"
           :title="peakRateTitle"
         >
           {{ peakRateText }}
@@ -46,7 +46,7 @@
       <!-- Checkmark -->
       <svg
         v-if="showCheckmark && selected"
-        class="h-4 w-4 shrink-0 text-primary-600 dark:text-primary-400"
+        class="h-4 w-4 shrink-0 text-[#4f6b5e] dark:text-[#9ab5a6]"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -127,20 +127,20 @@ const peakRateTitle = computed(() => {
 const ratePillClass = computed(() => {
   switch (props.platform) {
     case 'anthropic':
-      return 'bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400'
+      return 'bg-[#c9a88c]/10 text-[#756554] dark:bg-[#c9a88c]/10 dark:text-[#c9a88c]'
     case 'openai':
-      return 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400'
+      return 'bg-[#5a7a6b]/10 text-[#4f6b5e] dark:bg-[#9ab5a6]/10 dark:text-[#9ab5a6]'
     case 'gemini':
-      return 'bg-sky-50 text-sky-700 dark:bg-sky-900/20 dark:text-sky-400'
+      return 'bg-[#7ba0b8]/10 text-[#4f6879] dark:bg-[#b6cddd]/10 dark:text-[#b6cddd]'
     default: // antigravity and others
-      return 'bg-violet-50 text-violet-700 dark:bg-violet-900/20 dark:text-violet-400'
+      return 'bg-[#a89279]/10 text-[#756554] dark:bg-[#c9a88c]/10 dark:text-[#c9a88c]'
   }
 })
 </script>
 
 <style scoped>
-/* Bold the group name inside GroupBadge when used in dropdown option */
+/* Emphasize the group name inside GroupBadge when used in dropdown option */
 .groupOptionItemBadge :deep(span.truncate) {
-  font-weight: 600;
+  font-weight: 300;
 }
 </style>

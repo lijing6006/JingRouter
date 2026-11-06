@@ -2,13 +2,13 @@
   <div class="w-full">
     <label v-if="label" :for="id" class="input-label mb-1.5 block">
       {{ label }}
-      <span v-if="required" class="text-red-500">*</span>
+      <span v-if="required" class="text-[#8b5e52] dark:text-[#c99b90]">*</span>
     </label>
     <div class="relative">
       <!-- Prefix Icon Slot -->
       <div
         v-if="$slots.prefix"
-        class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400 dark:text-dark-400"
+        class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-[#756554] dark:text-[#c9a88c]"
       >
         <slot name="prefix"></slot>
       </div>
@@ -24,11 +24,11 @@
         :autocomplete="autocomplete"
         :readonly="readonly"
         :class="[
-          'input w-full transition-all duration-200',
+          'input w-full bg-white transition-colors duration-500 focus:border-[#5a7a6b] focus:outline-none focus:ring-1 focus:ring-[#5a7a6b]/20 dark:bg-[#2f2d2a] dark:focus:border-[#9ab5a6] dark:focus:ring-[#9ab5a6]/20',
           $slots.prefix ? 'pl-11' : '',
           $slots.suffix ? 'pr-11' : '',
-          error ? 'input-error ring-2 ring-red-500/20' : '',
-          disabled ? 'cursor-not-allowed bg-gray-100 opacity-60 dark:bg-dark-900' : ''
+          error ? 'input-error ring-1 ring-[#8b5e52]/20 dark:ring-[#c99b90]/20' : '',
+          disabled ? 'cursor-not-allowed bg-[#ede7e0] opacity-60 dark:bg-[#242321]' : ''
         ]"
         @input="onInput"
         @change="$emit('change', ($event.target as HTMLInputElement).value)"
@@ -40,7 +40,7 @@
       <!-- Suffix Slot (e.g. Password Toggle or Clear Button) -->
       <div
         v-if="$slots.suffix"
-        class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 dark:text-dark-400"
+        class="absolute inset-y-0 right-0 flex items-center pr-3 text-[#756554] dark:text-[#c9a88c]"
       >
         <slot name="suffix"></slot>
       </div>

@@ -27,7 +27,7 @@
         <!-- Search and Batch Test Header -->
         <div class="select-header">
           <div class="select-search">
-            <Icon name="search" size="sm" class="text-gray-400" />
+            <Icon name="search" size="sm" class="text-[#a89279] dark:text-[#c9a88c]" />
             <input
               ref="searchInputRef"
               v-model="searchQuery"
@@ -72,7 +72,7 @@
             :class="['select-option', modelValue === null && 'select-option-selected']"
           >
             <span class="select-option-label">{{ t('admin.accounts.noProxy') }}</span>
-            <Icon v-if="modelValue === null" name="check" size="sm" class="text-primary-500" />
+            <Icon v-if="modelValue === null" name="check" size="sm" class="text-[#4f6b5e] dark:text-[#9ab5a6]" />
           </div>
 
           <!-- Proxy options -->
@@ -84,11 +84,11 @@
           >
             <div class="min-w-0 flex-1">
               <div class="flex items-center gap-2">
-                <span class="truncate font-medium">{{ proxy.name }}</span>
+                <span class="truncate font-light">{{ proxy.name }}</span>
                 <!-- Account count badge -->
                 <span
                   v-if="proxy.account_count !== undefined"
-                  class="inline-flex flex-shrink-0 items-center rounded bg-gray-100 px-1.5 py-0.5 text-xs text-gray-600 dark:bg-dark-600 dark:text-gray-400"
+                  class="inline-flex flex-shrink-0 items-center rounded-sm bg-[#d4cdc5]/20 px-1.5 py-0.5 text-xs font-light text-[#756554] dark:bg-[#4a4540]/30 dark:text-[#c9a88c]"
                 >
                   {{ proxy.account_count }}
                 </span>
@@ -96,7 +96,7 @@
                 <template v-if="testResults[proxy.id]">
                   <span
                     v-if="testResults[proxy.id].success"
-                    class="inline-flex flex-shrink-0 items-center gap-1 rounded bg-emerald-100 px-1.5 py-0.5 text-xs text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+                    class="inline-flex flex-shrink-0 items-center gap-1 rounded-sm bg-[#5a7a6b]/10 px-1.5 py-0.5 text-xs font-light text-[#4f6b5e] dark:bg-[#9ab5a6]/10 dark:text-[#9ab5a6]"
                   >
                     <span v-if="testResults[proxy.id].country">{{
                       testResults[proxy.id].country
@@ -107,13 +107,13 @@
                   </span>
                   <span
                     v-else
-                    class="inline-flex flex-shrink-0 items-center rounded bg-red-100 px-1.5 py-0.5 text-xs text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                    class="inline-flex flex-shrink-0 items-center rounded-sm bg-[#c9a88c]/10 px-1.5 py-0.5 text-xs font-light text-[#756554] dark:bg-[#c9a88c]/10 dark:text-[#c9a88c]"
                   >
                     {{ t('admin.proxies.testFailed') }}
                   </span>
                 </template>
               </div>
-              <div class="truncate text-xs text-gray-500 dark:text-gray-400">
+              <div class="truncate text-xs font-light text-[#756554] dark:text-[#c9a88c]">
                 {{ proxy.protocol }}://{{ proxy.host }}:{{ proxy.port }}
               </div>
             </div>
@@ -153,7 +153,7 @@
               v-if="modelValue === proxy.id"
               name="check"
               size="sm"
-              class="flex-shrink-0 text-primary-500"
+              class="flex-shrink-0 text-[#4f6b5e] dark:text-[#9ab5a6]"
             />
           </div>
 
@@ -315,22 +315,23 @@ onUnmounted(() => {
 <style scoped>
 .select-trigger {
   @apply flex w-full items-center justify-between gap-2;
-  @apply rounded-xl px-4 py-2.5 text-sm;
-  @apply bg-white dark:bg-dark-800;
-  @apply border border-gray-200 dark:border-dark-600;
-  @apply text-gray-900 dark:text-gray-100;
-  @apply transition-all duration-200;
-  @apply focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30;
-  @apply hover:border-gray-300 dark:hover:border-dark-500;
+  @apply rounded-sm px-4 py-2.5 text-sm font-light;
+  @apply bg-white dark:bg-[#2f2d2a];
+  @apply border border-[#d4cdc5]/40 dark:border-[#4a4540];
+  @apply text-[#3d3d3d] dark:text-[#ede7e0];
+  @apply transition-colors duration-500;
+  @apply focus:border-[#5a7a6b] focus:outline-none focus:ring-1 focus:ring-[#5a7a6b]/20;
+  @apply hover:border-[#d4cdc5] dark:hover:border-[#6f6a64];
+  @apply dark:focus:border-[#9ab5a6] dark:focus:ring-[#9ab5a6]/20;
   @apply cursor-pointer;
 }
 
 .select-trigger-open {
-  @apply border-primary-500 ring-2 ring-primary-500/30;
+  @apply border-[#5a7a6b] ring-1 ring-[#5a7a6b]/20 dark:border-[#9ab5a6] dark:ring-[#9ab5a6]/20;
 }
 
 .select-trigger-disabled {
-  @apply cursor-not-allowed bg-gray-100 opacity-60 dark:bg-dark-900;
+  @apply cursor-not-allowed bg-[#ede7e0] opacity-60 dark:bg-[#242321];
 }
 
 .select-value {
@@ -338,21 +339,21 @@ onUnmounted(() => {
 }
 
 .select-icon {
-  @apply flex-shrink-0 text-gray-400 dark:text-dark-400;
+  @apply flex-shrink-0 text-[#a89279] dark:text-[#c9a88c];
 }
 
 .select-dropdown {
   @apply absolute z-[100] mt-2 w-full;
-  @apply bg-white dark:bg-dark-800;
-  @apply rounded-xl;
-  @apply border border-gray-200 dark:border-dark-700;
-  @apply shadow-lg shadow-black/10 dark:shadow-black/30;
+  @apply bg-white dark:bg-[#2f2d2a];
+  @apply rounded-sm;
+  @apply border border-[#d4cdc5]/40 dark:border-[#4a4540];
+  @apply shadow-md;
   @apply overflow-hidden;
 }
 
 .select-header {
   @apply flex items-center gap-2 px-3 py-2;
-  @apply border-b border-gray-100 dark:border-dark-700;
+  @apply border-b border-[#d4cdc5]/40 dark:border-[#4a4540];
 }
 
 .select-search {
@@ -361,15 +362,15 @@ onUnmounted(() => {
 
 .select-search-input {
   @apply flex-1 bg-transparent text-sm;
-  @apply text-gray-900 dark:text-gray-100;
-  @apply placeholder:text-gray-400 dark:placeholder:text-dark-400;
+  @apply text-[#3d3d3d] dark:text-[#ede7e0];
+  @apply placeholder:text-[#756554] dark:placeholder:text-[#a89279];
   @apply focus:outline-none;
 }
 
 .batch-test-btn {
   @apply flex-shrink-0 rounded-lg p-1.5;
-  @apply text-gray-500 hover:text-emerald-600 dark:hover:text-emerald-400;
-  @apply hover:bg-emerald-50 dark:hover:bg-emerald-900/20;
+  @apply text-[#756554] hover:text-[#4f6b5e] dark:text-[#c9a88c] dark:hover:text-[#9ab5a6];
+  @apply hover:bg-[#5a7a6b]/10 dark:hover:bg-[#9ab5a6]/10;
   @apply transition-colors disabled:cursor-not-allowed disabled:opacity-50;
 }
 
@@ -380,14 +381,14 @@ onUnmounted(() => {
 .select-option {
   @apply flex items-center justify-between gap-2;
   @apply px-4 py-2.5 text-sm;
-  @apply text-gray-700 dark:text-gray-300;
-  @apply cursor-pointer transition-colors duration-150;
-  @apply hover:bg-gray-50 dark:hover:bg-dark-700;
+  @apply text-[#3d3d3d] dark:text-[#ede7e0];
+  @apply cursor-pointer transition-colors duration-500;
+  @apply hover:bg-[#ede7e0]/45 dark:hover:bg-[#3a3733]/60;
 }
 
 .select-option-selected {
-  @apply bg-primary-50 dark:bg-primary-900/20;
-  @apply text-primary-700 dark:text-primary-300;
+  @apply bg-[#5a7a6b]/10 dark:bg-[#9ab5a6]/10;
+  @apply text-[#4f6b5e] dark:text-[#9ab5a6];
 }
 
 .select-option-label {
@@ -396,13 +397,13 @@ onUnmounted(() => {
 
 .select-empty {
   @apply px-4 py-8 text-center text-sm;
-  @apply text-gray-500 dark:text-dark-400;
+  @apply text-[#756554] dark:text-[#c9a88c];
 }
 
 .test-btn {
   @apply flex-shrink-0 rounded p-1;
-  @apply text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400;
-  @apply hover:bg-emerald-50 dark:hover:bg-emerald-900/20;
+  @apply text-[#a89279] hover:text-[#4f6b5e] dark:text-[#c9a88c] dark:hover:text-[#9ab5a6];
+  @apply hover:bg-[#5a7a6b]/10 dark:hover:bg-[#9ab5a6]/10;
   @apply transition-colors disabled:cursor-not-allowed disabled:opacity-50;
 }
 

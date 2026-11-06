@@ -3,13 +3,13 @@
     <!-- Preview Box -->
     <div class="flex-shrink-0">
       <div
-        class="flex items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 dark:border-dark-600 dark:bg-dark-800"
+        class="flex items-center justify-center overflow-hidden rounded-sm border border-dashed border-[#d4cdc5]/40 bg-[#ede7e0]/35 dark:border-[#4a4540] dark:bg-[#2f2d2a]"
         :class="[previewSizeClass, { 'border-solid': !!modelValue }]"
       >
         <!-- SVG mode: render inline -->
         <span
           v-if="mode === 'svg' && modelValue"
-          class="text-gray-600 dark:text-gray-300 [&>svg]:h-full [&>svg]:w-full"
+          class="text-[#756554] dark:text-[#c9a88c] [&>svg]:h-full [&>svg]:w-full"
           :class="innerSizeClass"
           v-html="sanitizedValue"
         ></span>
@@ -23,7 +23,7 @@
         <!-- Empty placeholder -->
         <svg
           v-else
-          class="text-gray-400 dark:text-dark-500"
+          class="text-[#a89279] dark:text-[#c9a88c]"
           :class="placeholderSizeClass"
           fill="none"
           viewBox="0 0 24 24"
@@ -55,15 +55,15 @@
         <button
           v-if="modelValue"
           type="button"
-          class="btn btn-secondary btn-sm text-red-600 hover:text-red-700 dark:text-red-400"
+          class="btn btn-secondary btn-sm text-[#756554] hover:text-[#8b5e52] dark:text-[#c9a88c] dark:hover:text-[#d7bb9f]"
           @click="removeImage"
         >
           <Icon name="trash" size="sm" class="mr-1.5" :stroke-width="2" />
           {{ resolvedRemoveLabel }}
         </button>
       </div>
-      <p v-if="hint" class="text-xs text-gray-500 dark:text-gray-400">{{ hint }}</p>
-      <p v-if="error" class="text-xs text-red-500">{{ error }}</p>
+      <p v-if="hint" class="text-xs font-extralight text-[#756554] dark:text-[#c9a88c]">{{ hint }}</p>
+      <p v-if="error" class="text-xs font-light text-[#8b5e52] dark:text-[#c99b90]">{{ error }}</p>
     </div>
   </div>
 </template>
