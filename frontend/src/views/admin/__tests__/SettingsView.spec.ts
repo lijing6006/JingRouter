@@ -132,6 +132,7 @@ vi.mock("@/stores", () => ({
 vi.mock("@/stores/adminSettings", () => ({
   useAdminSettingsStore: () => ({
     fetch: adminSettingsFetch,
+    setAdminMenuVisibilityLocal: vi.fn(),
   }),
 }));
 

@@ -163,7 +163,7 @@ type SystemSettings struct {
 	TableDefaultPageSize        int              `json:"table_default_page_size"`
 	TablePageSizeOptions        []int            `json:"table_page_size_options"`
 	CustomMenuItems             []CustomMenuItem `json:"custom_menu_items"`
-	AdminMenuVisibility         map[string]bool `json:"admin_menu_visibility"`
+	AdminMenuVisibility         map[string]bool  `json:"admin_menu_visibility"`
 	CustomEndpoints             []CustomEndpoint `json:"custom_endpoints"`
 
 	DefaultConcurrency           int                          `json:"default_concurrency"`
