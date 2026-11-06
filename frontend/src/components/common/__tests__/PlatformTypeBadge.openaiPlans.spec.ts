@@ -19,38 +19,38 @@ function mountPlan(platform: AccountPlatform, planType: string) {
 }
 
 describe('PlatformTypeBadge ChatGPT plan tiers', () => {
-  it('labels pro / chatgptpro as Pro 200 with the Pro color', () => {
+  it('labels pro / chatgptpro as Pro 200 with the terracotta Pro color', () => {
     for (const planType of ['pro', 'chatgptpro', 'PRO']) {
       const wrapper = mountPlan('openai', planType)
 
       expect(wrapper.text()).toContain('Pro 200')
-      expect(wrapper.html()).toContain('bg-violet-100')
+      expect(wrapper.html()).toContain('bg-[#c9a88c]/10')
     }
   })
 
-  it('labels prolite as Pro 100 sharing the Pro color', () => {
+  it('labels prolite as Pro 100 sharing the terracotta Pro color', () => {
     for (const planType of ['prolite', 'PROLITE', 'pro_lite']) {
       const wrapper = mountPlan('openai', planType)
 
       expect(wrapper.text()).toContain('Pro 100')
-      expect(wrapper.html()).toContain('bg-violet-100')
+      expect(wrapper.html()).toContain('bg-[#c9a88c]/10')
       expect(wrapper.text()).not.toContain('Pro 200')
     }
   })
 
-  it('labels team as Business with the Team color', () => {
+  it('labels team as Business with the pine Team color', () => {
     const wrapper = mountPlan('openai', 'team')
 
     expect(wrapper.text()).toContain('Business')
-    expect(wrapper.html()).toContain('bg-indigo-100')
+    expect(wrapper.html()).toContain('bg-[#5a7a6b]/10')
   })
 
-  it('labels self_serve_business_prolite as Business Premium sharing the Team color', () => {
+  it('labels self_serve_business_prolite as Business Premium sharing the pine Team color', () => {
     for (const planType of ['self_serve_business_prolite', 'selfservebusinessprolite']) {
       const wrapper = mountPlan('openai', planType)
 
       expect(wrapper.text()).toContain('Business Premium')
-      expect(wrapper.html()).toContain('bg-indigo-100')
+      expect(wrapper.html()).toContain('bg-[#5a7a6b]/10')
       expect(wrapper.text()).not.toContain('self_serve_business_prolite')
     }
   })
@@ -58,15 +58,15 @@ describe('PlatformTypeBadge ChatGPT plan tiers', () => {
   it('keeps plus, free and abnormal labels unchanged', () => {
     const plus = mountPlan('openai', 'plus')
     expect(plus.text()).toContain('Plus')
-    expect(plus.html()).toContain('bg-sky-100')
+    expect(plus.html()).toContain('bg-[#7ba0b8]/10')
 
     const free = mountPlan('openai', 'free')
     expect(free.text()).toContain('Free')
-    expect(free.html()).toContain('bg-gray-100')
+    expect(free.html()).toContain('bg-[#d4cdc5]/30')
 
     const abnormal = mountPlan('openai', 'abnormal')
     expect(abnormal.text()).toContain('admin.accounts.subscriptionAbnormal')
-    expect(abnormal.html()).toContain('bg-red-100')
+    expect(abnormal.html()).toContain('bg-[#c9a88c]/10')
   })
 
   it('falls back to the raw value for unknown plans', () => {
@@ -94,14 +94,14 @@ describe('PlatformTypeBadge ChatGPT plan tiers', () => {
 
 describe('new Codex subscription labels', () => {
   it.each([
-    ['promax', 'Pro 500', 'bg-violet-100'],
+    ['promax', 'Pro 500', 'bg-[#c9a88c]/10'],
     ['go', 'Go', ''],
-    ['ent26', 'Enterprise', 'bg-indigo-100'],
-    ['enterprise_cbp_automation', 'Enterprise (Automation)', 'bg-indigo-100'],
-    ['self_serve_business_usage_based', 'Business', 'bg-indigo-100'],
-    ['business', 'Enterprise', 'bg-indigo-100'],
-    ['edu_plus', 'Edu Plus', 'bg-indigo-100'],
-    ['edu_pro', 'Edu Pro', 'bg-indigo-100']
+    ['ent26', 'Enterprise', 'bg-[#5a7a6b]/10'],
+    ['enterprise_cbp_automation', 'Enterprise (Automation)', 'bg-[#5a7a6b]/10'],
+    ['self_serve_business_usage_based', 'Business', 'bg-[#5a7a6b]/10'],
+    ['business', 'Enterprise', 'bg-[#5a7a6b]/10'],
+    ['edu_plus', 'Edu Plus', 'bg-[#5a7a6b]/10'],
+    ['edu_pro', 'Edu Pro', 'bg-[#5a7a6b]/10']
   ])('displays %s', (sku, label, color) => {
     const wrapper = mountPlan('openai', sku)
     expect(wrapper.text()).toContain(label)
