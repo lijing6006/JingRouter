@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { adminAPI } from '@/api'
 import type { CustomMenuItem } from '@/types'
+import { normalizeAdminMenuVisibility } from '@/utils/adminMenuVisibility'
 
 export const useAdminSettingsStore = defineStore('adminSettings', () => {
   const loaded = ref(false)
@@ -44,12 +45,32 @@ export const useAdminSettingsStore = defineStore('adminSettings', () => {
     }
   }
 
+  const readCachedMenuVisibility = (): Record<string, boolean> => {
+    try {
+      const raw = localStorage.getItem('admin_menu_visibility_cached')
+      if (raw) return normalizeAdminMenuVisibility(JSON.parse(raw))
+    } catch {
+      // ignore localStorage failures
+    }
+    return {}
+  }
+
+  const writeCachedMenuVisibility = (value: Record<string, boolean>) => {
+    try {
+      localStorage.setItem('admin_menu_visibility_cached', JSON.stringify(value))
+    } catch {
+      // ignore localStorage failures
+    }
+  }
+
   // Default open, but honor cached value to reduce UI flicker on first paint.
   const opsMonitoringEnabled = ref(readCachedBool('ops_monitoring_enabled_cached', true))
   const opsRealtimeMonitoringEnabled = ref(readCachedBool('ops_realtime_monitoring_enabled_cached', true))
   const opsQueryModeDefault = ref(readCachedString('ops_query_mode_default_cached', 'auto'))
   const paymentEnabled = ref(readCachedBool('payment_enabled_cached', false))
   const customMenuItems = ref<CustomMenuItem[]>([])
+  // 后台菜单显示/隐藏：缺失的 key 视为显示（normalize 后只有显式值）。
+  const adminMenuVisibility = ref<Record<string, boolean>>(readCachedMenuVisibility())
 
   async function fetch(force = false): Promise<void> {
     if (loaded.value && !force) return
@@ -71,6 +92,9 @@ export const useAdminSettingsStore = defineStore('adminSettings', () => {
       writeCachedString('ops_query_mode_default_cached', opsQueryModeDefault.value)
 
       customMenuItems.value = Array.isArray(settings.custom_menu_items) ? settings.custom_menu_items : []
+
+      adminMenuVisibility.value = normalizeAdminMenuVisibility(settings.admin_menu_visibility)
+      writeCachedMenuVisibility(adminMenuVisibility.value)
 
       paymentEnabled.value = paymentConfigResp.data?.enabled ?? false
       writeCachedBool('payment_enabled_cached', paymentEnabled.value)
@@ -108,6 +132,12 @@ export const useAdminSettingsStore = defineStore('adminSettings', () => {
     loaded.value = true
   }
 
+  function setAdminMenuVisibilityLocal(value: Record<string, boolean>) {
+    adminMenuVisibility.value = normalizeAdminMenuVisibility(value)
+    writeCachedMenuVisibility(adminMenuVisibility.value)
+    loaded.value = true
+  }
+
   // Keep UI consistent if we learn that ops is disabled via feature-gated 404s.
   // (event is dispatched from the axios interceptor)
   let eventHandlerCleanup: (() => void) | null = null
@@ -140,10 +170,12 @@ export const useAdminSettingsStore = defineStore('adminSettings', () => {
     opsQueryModeDefault,
     paymentEnabled,
     customMenuItems,
+    adminMenuVisibility,
     fetch,
     setOpsMonitoringEnabledLocal,
     setOpsRealtimeMonitoringEnabledLocal,
     setPaymentEnabledLocal,
-    setOpsQueryModeDefaultLocal
+    setOpsQueryModeDefaultLocal,
+    setAdminMenuVisibilityLocal
   }
 })

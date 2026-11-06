@@ -6914,6 +6914,40 @@
               </button>
             </div>
           </div>
+
+          <!-- Admin Menu Visibility -->
+          <div class="card">
+            <div
+              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+            >
+              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+                {{ t("admin.settings.menuVisibility.title") }}
+              </h2>
+              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                {{ t("admin.settings.menuVisibility.description") }}
+              </p>
+            </div>
+            <div class="space-y-4 p-6">
+              <div
+                v-for="item in adminMenuVisibilityItems"
+                :key="item.key"
+                class="flex items-center justify-between border-b border-gray-100 pb-4 last:border-b-0 last:pb-0 dark:border-dark-700"
+              >
+                <div>
+                  <label class="font-medium text-gray-900 dark:text-white">{{
+                    t(item.labelKey)
+                  }}</label>
+                </div>
+                <Toggle
+                  :model-value="isMenuVisible(item.key)"
+                  @update:model-value="(v: boolean) => setMenuVisible(item.key, v)"
+                />
+              </div>
+              <p class="text-xs text-gray-500 dark:text-gray-400">
+                {{ t("admin.settings.menuVisibility.hint") }}
+              </p>
+            </div>
+          </div>
 	        </div>
 	        <!-- /Tab: General -->
 
@@ -9000,6 +9034,12 @@ import {
   type RechargeBonusMode,
   type RechargeBonusTierDraft,
 } from "@/utils/rechargeBonus";
+import {
+  ADMIN_MENU_VISIBILITY_ITEMS,
+  isAdminMenuVisible,
+  normalizeAdminMenuVisibility,
+  sanitizeAdminMenuVisibility,
+} from "@/utils/adminMenuVisibility";
 import OpenAIFastPolicyUserSelector from "@/views/admin/settings/OpenAIFastPolicyUserSelector.vue";
 import { useClipboard } from "@/composables/useClipboard";
 import {
@@ -9818,6 +9858,8 @@ const form = reactive<SettingsForm>({
     sort_order: number;
     hide_open_button?: boolean;
   }>,
+  // 后台左侧菜单显示/隐藏：key -> 是否显示，缺失视为显示。
+  admin_menu_visibility: {} as Record<string, boolean>,
   custom_endpoints: [] as Array<{
     name: string;
     endpoint: string;
@@ -10813,6 +10855,20 @@ function addMenuItem() {
   });
 }
 
+// 后台菜单显示/隐藏：每行开关的读写（缺失视为显示）。
+const adminMenuVisibilityItems = ADMIN_MENU_VISIBILITY_ITEMS;
+
+function isMenuVisible(key: string): boolean {
+  return isAdminMenuVisible(form.admin_menu_visibility, key);
+}
+
+function setMenuVisible(key: string, visible: boolean) {
+  form.admin_menu_visibility = {
+    ...form.admin_menu_visibility,
+    [key]: visible,
+  };
+}
+
 function removeMenuItem(index: number) {
   form.custom_menu_items.splice(index, 1);
   // Re-index sort_order
@@ -11072,6 +11128,7 @@ async function loadSettings() {
     );
     form.payment_recharge_bonus_notice = settings.payment_recharge_bonus_notice || "";
     form.default_platform_quotas = normalizePlatformQuotasMap(settings.default_platform_quotas);
+    form.admin_menu_visibility = normalizeAdminMenuVisibility(settings.admin_menu_visibility);
     form.account_scheduling_thresholds = normalizeAccountSchedulingThresholdsMap(
       settings.account_scheduling_thresholds,
     );
@@ -11487,6 +11544,7 @@ async function saveSettings() {
       table_default_page_size: form.table_default_page_size,
       table_page_size_options: form.table_page_size_options,
       custom_menu_items: form.custom_menu_items,
+      admin_menu_visibility: sanitizeAdminMenuVisibility(form.admin_menu_visibility),
       custom_endpoints: form.custom_endpoints,
       frontend_url: form.frontend_url,
       smtp_host: form.smtp_host,
@@ -11820,6 +11878,9 @@ async function saveSettings() {
     form.account_scheduling_thresholds = normalizeAccountSchedulingThresholdsMap(
       updated.account_scheduling_thresholds,
     );
+    form.admin_menu_visibility = normalizeAdminMenuVisibility(updated.admin_menu_visibility);
+    // 同步到侧边栏 store：保存后无需刷新页面，左侧菜单立即按新配置显示/隐藏。
+    adminSettingsStore.setAdminMenuVisibilityLocal(form.admin_menu_visibility);
     registrationEmailSuffixWhitelistTags.value =
       normalizeRegistrationEmailSuffixDomains(
         updated.registration_email_suffix_whitelist,

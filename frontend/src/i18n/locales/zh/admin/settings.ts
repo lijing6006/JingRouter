@@ -720,6 +720,11 @@ export default {
         moveUp: '上移',
         moveDown: '下移',
       },
+      menuVisibility: {
+        title: '菜单显示',
+        description: '选择在左侧导航中显示哪些管理菜单，关掉的不再显示。',
+        hint: '隐藏的菜单仍可通过直接访问地址打开；“系统设置”始终显示，不可隐藏。',
+      },
       payment: {
         title: '支付设置',
         description: '配置支付系统选项',

@@ -495,6 +495,8 @@ export interface SystemSettings {
   backend_mode_enabled: boolean;
   custom_menu_items: CustomMenuItem[];
   custom_endpoints: CustomEndpoint[];
+  // 后台左侧菜单显示/隐藏：key -> 是否显示，缺失视为显示；「系统设置」不在其中。
+  admin_menu_visibility?: Record<string, boolean>;
   // SMTP settings
   smtp_host: string;
   smtp_port: number;
@@ -847,6 +849,7 @@ export interface UpdateSettingsRequest {
   backend_mode_enabled?: boolean;
   custom_menu_items?: CustomMenuItem[];
   custom_endpoints?: CustomEndpoint[];
+  admin_menu_visibility?: Record<string, boolean>;
   smtp_host?: string;
   smtp_port?: number;
   smtp_username?: string;

@@ -725,6 +725,11 @@ export default {
         moveUp: 'Move Up',
         moveDown: 'Move Down',
       },
+      menuVisibility: {
+        title: 'Menu Visibility',
+        description: 'Choose which admin menus appear in the left navigation. Turned-off menus are hidden.',
+        hint: 'Hidden menus can still be opened by visiting their URL directly. “Settings” is always shown and cannot be hidden.',
+      },
       payment: {
         title: 'Payment Settings',
         description: 'Configure payment system options',
