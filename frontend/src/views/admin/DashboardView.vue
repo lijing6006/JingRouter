@@ -1,6 +1,6 @@
 <template>
   <AppLayout>
-    <div class="space-y-6">
+    <div class="space-y-8 text-[#3d3d3d] dark:text-[#ede7e0]">
       <!-- Loading State -->
       <div v-if="loading" class="flex items-center justify-center py-12">
         <LoadingSpinner />
@@ -8,21 +8,21 @@
 
       <template v-else-if="stats">
         <!-- Row 1: Core Stats -->
-        <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div class="grid grid-cols-2 gap-5 lg:grid-cols-4">
           <!-- Total API Keys -->
-          <div class="card p-4">
+          <div class="card rounded-lg p-5 transition-all">
             <div class="flex items-center gap-3">
-              <div class="rounded-lg bg-blue-100 p-2 dark:bg-blue-900/30">
-                <Icon name="key" size="md" class="text-blue-600 dark:text-blue-400" :stroke-width="2" />
+              <div class="rounded-sm bg-[#5a7a6b]/10 p-2 dark:bg-[#9ab5a6]/15">
+                <Icon name="key" size="md" class="text-[#5a7a6b] dark:text-[#9ab5a6]" :stroke-width="2" />
               </div>
               <div>
-                <p class="text-xs font-medium text-gray-500 dark:text-gray-400">
+                <p class="text-xs font-light text-[#756554] dark:text-[#c9a88c]">
                   {{ t('admin.dashboard.apiKeys') }}
                 </p>
-                <p class="text-xl font-bold text-gray-900 dark:text-white">
+                <p class="text-xl font-light text-[#3d3d3d] dark:text-[#ede7e0]">
                   {{ stats.total_api_keys }}
                 </p>
-                <p class="text-xs text-green-600 dark:text-green-400">
+                <p class="inline-flex rounded-sm bg-[#5a7a6b]/10 px-1.5 py-0.5 text-xs font-light text-[#3d3d3d] dark:bg-[#9ab5a6]/15 dark:text-[#ede7e0]">
                   {{ stats.active_api_keys }} {{ t('common.active') }}
                 </p>
               </div>
@@ -30,23 +30,23 @@
           </div>
 
           <!-- Service Accounts -->
-          <div class="card p-4">
+          <div class="card rounded-lg p-5 transition-all">
             <div class="flex items-center gap-3">
-              <div class="rounded-lg bg-purple-100 p-2 dark:bg-purple-900/30">
-                <Icon name="server" size="md" class="text-purple-600 dark:text-purple-400" :stroke-width="2" />
+              <div class="rounded-sm bg-[#7ba0b8]/10 p-2 dark:bg-[#b6cddd]/10">
+                <Icon name="server" size="md" class="text-[#7ba0b8] dark:text-[#b6cddd]" :stroke-width="2" />
               </div>
               <div>
-                <p class="text-xs font-medium text-gray-500 dark:text-gray-400">
+                <p class="text-xs font-light text-[#756554] dark:text-[#c9a88c]">
                   {{ t('admin.dashboard.accounts') }}
                 </p>
-                <p class="text-xl font-bold text-gray-900 dark:text-white">
+                <p class="text-xl font-light text-[#3d3d3d] dark:text-[#ede7e0]">
                   {{ stats.total_accounts }}
                 </p>
                 <p class="text-xs">
-                  <span class="text-green-600 dark:text-green-400"
+                  <span class="inline-flex rounded-sm bg-[#5a7a6b]/10 px-1.5 py-0.5 text-xs font-light text-[#3d3d3d] dark:bg-[#9ab5a6]/15 dark:text-[#ede7e0]"
                     >{{ stats.normal_accounts }} {{ t('common.active') }}</span
                   >
-                  <span v-if="stats.error_accounts > 0" class="ml-1 text-red-500"
+                  <span v-if="stats.error_accounts > 0" class="ml-1 inline-flex rounded-sm bg-[#c9a88c]/10 px-1.5 py-0.5 text-xs font-light text-[#3d3d3d] dark:bg-[#c9a88c]/15 dark:text-[#ede7e0]"
                     >{{ stats.error_accounts }} {{ t('common.error') }}</span
                   >
                 </p>
@@ -55,19 +55,19 @@
           </div>
 
           <!-- Today Requests -->
-          <div class="card p-4">
+          <div class="card rounded-lg p-5 transition-all">
             <div class="flex items-center gap-3">
-              <div class="rounded-lg bg-green-100 p-2 dark:bg-green-900/30">
-                <Icon name="chart" size="md" class="text-green-600 dark:text-green-400" :stroke-width="2" />
+              <div class="rounded-sm bg-[#5a7a6b]/10 p-2 dark:bg-[#9ab5a6]/15">
+                <Icon name="chart" size="md" class="text-[#5a7a6b] dark:text-[#9ab5a6]" :stroke-width="2" />
               </div>
               <div>
-                <p class="text-xs font-medium text-gray-500 dark:text-gray-400">
+                <p class="text-xs font-light text-[#756554] dark:text-[#c9a88c]">
                   {{ t('admin.dashboard.todayRequests') }}
                 </p>
-                <p class="text-xl font-bold text-gray-900 dark:text-white">
+                <p class="text-xl font-light text-[#3d3d3d] dark:text-[#ede7e0]">
                   {{ stats.today_requests }}
                 </p>
-                <p class="text-xs text-gray-500 dark:text-gray-400">
+                <p class="text-xs font-light text-[#756554] dark:text-[#c9a88c]">
                   {{ t('common.total') }}: {{ formatNumber(stats.total_requests) }}
                 </p>
               </div>
@@ -75,19 +75,19 @@
           </div>
 
           <!-- New Users Today -->
-          <div class="card p-4">
+          <div class="card rounded-lg p-5 transition-all">
             <div class="flex items-center gap-3">
-              <div class="rounded-lg bg-emerald-100 p-2 dark:bg-emerald-900/30">
-                <Icon name="userPlus" size="md" class="text-emerald-600 dark:text-emerald-400" :stroke-width="2" />
+              <div class="rounded-sm bg-[#c9a88c]/10 p-2 dark:bg-[#c9a88c]/15">
+                <Icon name="userPlus" size="md" class="text-[#756554] dark:text-[#c9a88c]" :stroke-width="2" />
               </div>
               <div>
-                <p class="text-xs font-medium text-gray-500 dark:text-gray-400">
+                <p class="text-xs font-light text-[#756554] dark:text-[#c9a88c]">
                   {{ t('admin.dashboard.users') }}
                 </p>
-                <p class="text-xl font-bold text-emerald-600 dark:text-emerald-400">
+                <p class="text-xl font-light text-[#5a7a6b] dark:text-[#9ab5a6]">
                   +{{ stats.today_new_users }}
                 </p>
-                <p class="text-xs text-gray-500 dark:text-gray-400">
+                <p class="text-xs font-light text-[#756554] dark:text-[#c9a88c]">
                   {{ t('common.total') }}: {{ formatNumber(stats.total_users) }}
                 </p>
               </div>
@@ -96,35 +96,35 @@
         </div>
 
         <!-- Row 2: Token Stats -->
-        <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div class="grid grid-cols-2 gap-5 lg:grid-cols-4">
           <!-- Today Tokens -->
-          <div class="card p-4">
+          <div class="card rounded-lg p-5 transition-all">
             <div class="flex items-center gap-3">
-              <div class="rounded-lg bg-amber-100 p-2 dark:bg-amber-900/30">
-                <Icon name="cube" size="md" class="text-amber-600 dark:text-amber-400" :stroke-width="2" />
+              <div class="rounded-sm bg-[#c9a88c]/10 p-2 dark:bg-[#c9a88c]/15">
+                <Icon name="cube" size="md" class="text-[#756554] dark:text-[#c9a88c]" :stroke-width="2" />
               </div>
               <div>
-                <p class="text-xs font-medium text-gray-500 dark:text-gray-400">
+                <p class="text-xs font-light text-[#756554] dark:text-[#c9a88c]">
                   {{ t('admin.dashboard.todayTokens') }}
                 </p>
-                <p class="text-xl font-bold text-gray-900 dark:text-white">
+                <p class="text-xl font-light text-[#3d3d3d] dark:text-[#ede7e0]">
                   {{ formatTokens(stats.today_tokens) }}
                 </p>
-                <p class="text-xs">
+                <p class="text-xs font-light">
                   <span
-                    class="text-green-600 dark:text-green-400"
+                    class="text-[#5a7a6b] dark:text-[#9ab5a6]"
                     :title="t('admin.dashboard.actual')"
                     >${{ formatCost(stats.today_actual_cost) }}</span
                   >
-                  <span class="text-gray-400 dark:text-gray-500"> / </span>
+                  <span class="text-[#d4cdc5] dark:text-[#4a4540]"> / </span>
                   <span
-                    class="text-orange-500 dark:text-orange-400"
+                    class="text-[#756554] dark:text-[#c9a88c]"
                     :title="t('admin.dashboard.accountCost')"
                     >${{ formatCost(stats.today_account_cost) }}</span
                   >
-                  <span class="text-gray-400 dark:text-gray-500"> / </span>
+                  <span class="text-[#d4cdc5] dark:text-[#4a4540]"> / </span>
                   <span
-                    class="text-gray-400 dark:text-gray-500"
+                    class="text-[#756554] dark:text-[#c9a88c]"
                     :title="t('admin.dashboard.standard')"
                     >${{ formatCost(stats.today_cost) }}</span
                   >
@@ -134,33 +134,33 @@
           </div>
 
           <!-- Total Tokens -->
-          <div class="card p-4">
+          <div class="card rounded-lg p-5 transition-all">
             <div class="flex items-center gap-3">
-              <div class="rounded-lg bg-indigo-100 p-2 dark:bg-indigo-900/30">
-                <Icon name="database" size="md" class="text-indigo-600 dark:text-indigo-400" :stroke-width="2" />
+              <div class="rounded-sm bg-[#7ba0b8]/10 p-2 dark:bg-[#b6cddd]/10">
+                <Icon name="database" size="md" class="text-[#7ba0b8] dark:text-[#b6cddd]" :stroke-width="2" />
               </div>
               <div>
-                <p class="text-xs font-medium text-gray-500 dark:text-gray-400">
+                <p class="text-xs font-light text-[#756554] dark:text-[#c9a88c]">
                   {{ t('admin.dashboard.totalTokens') }}
                 </p>
-                <p class="text-xl font-bold text-gray-900 dark:text-white">
+                <p class="text-xl font-light text-[#3d3d3d] dark:text-[#ede7e0]">
                   {{ formatTokens(stats.total_tokens) }}
                 </p>
-                <p class="text-xs">
+                <p class="text-xs font-light">
                   <span
-                    class="text-green-600 dark:text-green-400"
+                    class="text-[#5a7a6b] dark:text-[#9ab5a6]"
                     :title="t('admin.dashboard.actual')"
                     >${{ formatCost(stats.total_actual_cost) }}</span
                   >
-                  <span class="text-gray-400 dark:text-gray-500"> / </span>
+                  <span class="text-[#d4cdc5] dark:text-[#4a4540]"> / </span>
                   <span
-                    class="text-orange-500 dark:text-orange-400"
+                    class="text-[#756554] dark:text-[#c9a88c]"
                     :title="t('admin.dashboard.accountCost')"
                     >${{ formatCost(stats.total_account_cost) }}</span
                   >
-                  <span class="text-gray-400 dark:text-gray-500"> / </span>
+                  <span class="text-[#d4cdc5] dark:text-[#4a4540]"> / </span>
                   <span
-                    class="text-gray-400 dark:text-gray-500"
+                    class="text-[#756554] dark:text-[#c9a88c]"
                     :title="t('admin.dashboard.standard')"
                     >${{ formatCost(stats.total_cost) }}</span
                   >
@@ -170,45 +170,45 @@
           </div>
 
           <!-- Performance (RPM/TPM) -->
-          <div class="card p-4">
+          <div class="card rounded-lg p-5 transition-all">
             <div class="flex items-center gap-3">
-              <div class="rounded-lg bg-violet-100 p-2 dark:bg-violet-900/30">
-                <Icon name="bolt" size="md" class="text-violet-600 dark:text-violet-400" :stroke-width="2" />
+              <div class="rounded-sm bg-[#5a7a6b]/10 p-2 dark:bg-[#9ab5a6]/15">
+                <Icon name="bolt" size="md" class="text-[#5a7a6b] dark:text-[#9ab5a6]" :stroke-width="2" />
               </div>
               <div class="flex-1">
-                <p class="text-xs font-medium text-gray-500 dark:text-gray-400">
+                <p class="text-xs font-light text-[#756554] dark:text-[#c9a88c]">
                   {{ t('admin.dashboard.performance') }}
                 </p>
                 <div class="flex items-baseline gap-2">
-                  <p class="text-xl font-bold text-gray-900 dark:text-white">
+                  <p class="text-xl font-light text-[#3d3d3d] dark:text-[#ede7e0]">
                     {{ formatTokens(stats.rpm) }}
                   </p>
-                  <span class="text-xs text-gray-500 dark:text-gray-400">RPM</span>
+                  <span class="text-xs font-light text-[#756554] dark:text-[#c9a88c]">RPM</span>
                 </div>
                 <div class="flex items-baseline gap-2">
-                  <p class="text-sm font-semibold text-violet-600 dark:text-violet-400">
+                  <p class="text-sm font-light text-[#5a7a6b] dark:text-[#9ab5a6]">
                     {{ formatTokens(stats.tpm) }}
                   </p>
-                  <span class="text-xs text-gray-500 dark:text-gray-400">TPM</span>
+                  <span class="text-xs font-light text-[#756554] dark:text-[#c9a88c]">TPM</span>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Avg Response Time -->
-          <div class="card p-4">
+          <div class="card rounded-lg p-5 transition-all">
             <div class="flex items-center gap-3">
-              <div class="rounded-lg bg-rose-100 p-2 dark:bg-rose-900/30">
-                <Icon name="clock" size="md" class="text-rose-600 dark:text-rose-400" :stroke-width="2" />
+              <div class="rounded-sm bg-[#a89279]/10 p-2 dark:bg-[#c9a88c]/15">
+                <Icon name="clock" size="md" class="text-[#756554] dark:text-[#c9a88c]" :stroke-width="2" />
               </div>
               <div>
-                <p class="text-xs font-medium text-gray-500 dark:text-gray-400">
+                <p class="text-xs font-light text-[#756554] dark:text-[#c9a88c]">
                   {{ t('admin.dashboard.avgResponse') }}
                 </p>
-                <p class="text-xl font-bold text-gray-900 dark:text-white">
+                <p class="text-xl font-light text-[#3d3d3d] dark:text-[#ede7e0]">
                   {{ formatDuration(stats.average_duration_ms) }}
                 </p>
-                <p class="text-xs text-gray-500 dark:text-gray-400">
+                <p class="text-xs font-light text-[#756554] dark:text-[#c9a88c]">
                   {{ stats.active_users }} {{ t('admin.dashboard.activeUsers') }}
                 </p>
               </div>
@@ -217,60 +217,60 @@
         </div>
 
         <!-- Quick Actions -->
-        <div class="card p-4">
+        <div class="card rounded-lg p-5 transition-all">
           <div class="mb-3 flex items-center justify-between">
-            <h2 class="text-sm font-semibold text-gray-900 dark:text-white">
+            <h2 class="text-sm font-light text-[#3d3d3d] dark:text-[#ede7e0]">
               {{ t('admin.dashboard.quickActions') }}
             </h2>
           </div>
-          <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+          <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
             <button
               v-if="canUseBatchImage"
               type="button"
-              class="group flex items-center gap-3 rounded-lg bg-gray-50 p-3 text-left transition-colors hover:bg-sky-50 dark:bg-dark-800/50 dark:hover:bg-sky-900/20"
+              class="group flex items-center gap-3 rounded-sm p-3 text-left transition-all duration-200 hover:bg-[#7ba0b8]/10 focus:outline-none focus:ring-1 focus:ring-[#5a7a6b]/20 dark:hover:bg-[#b6cddd]/10"
               @click="router.push('/batch-image')"
             >
-              <span class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-sky-100 text-sky-600 dark:bg-sky-900/30 dark:text-sky-400">
+              <span class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-sm bg-[#7ba0b8]/10 text-[#7ba0b8] dark:bg-[#b6cddd]/10 dark:text-[#b6cddd]">
                 <Icon name="sparkles" size="md" :stroke-width="2" />
               </span>
               <span class="min-w-0 flex-1">
-                <span class="block text-sm font-medium text-gray-900 dark:text-white">
+                <span class="block text-sm font-light text-[#3d3d3d] dark:text-[#ede7e0]">
                   {{ t('admin.dashboard.batchImage') }}
                 </span>
-                <span class="block text-xs text-gray-500 dark:text-gray-400">
+                <span class="block text-xs font-light text-[#756554] dark:text-[#c9a88c]">
                   {{ t('admin.dashboard.batchImageDesc') }}
                 </span>
               </span>
-              <Icon name="chevronRight" size="sm" class="text-gray-400 group-hover:text-sky-500" />
+              <Icon name="chevronRight" size="sm" class="text-[#a89279] transition-colors duration-500 group-hover:text-[#5a7a6b] dark:text-[#c9a88c] dark:group-hover:text-[#9ab5a6]" />
             </button>
             <button
               type="button"
-              class="group flex items-center gap-3 rounded-lg bg-gray-50 p-3 text-left transition-colors hover:bg-emerald-50 dark:bg-dark-800/50 dark:hover:bg-emerald-900/20"
+              class="group flex items-center gap-3 rounded-sm p-3 text-left transition-all duration-200 hover:bg-[#5a7a6b]/10 focus:outline-none focus:ring-1 focus:ring-[#5a7a6b]/20 dark:hover:bg-[#9ab5a6]/10"
               @click="router.push('/admin/groups')"
             >
-              <span class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400">
+              <span class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-sm bg-[#5a7a6b]/10 text-[#5a7a6b] dark:bg-[#9ab5a6]/15 dark:text-[#9ab5a6]">
                 <Icon name="grid" size="md" :stroke-width="2" />
               </span>
               <span class="min-w-0 flex-1">
-                <span class="block text-sm font-medium text-gray-900 dark:text-white">
+                <span class="block text-sm font-light text-[#3d3d3d] dark:text-[#ede7e0]">
                   {{ t('admin.dashboard.groupPricing') }}
                 </span>
-                <span class="block text-xs text-gray-500 dark:text-gray-400">
+                <span class="block text-xs font-light text-[#756554] dark:text-[#c9a88c]">
                   {{ t('admin.dashboard.groupPricingDesc') }}
                 </span>
               </span>
-              <Icon name="chevronRight" size="sm" class="text-gray-400 group-hover:text-emerald-500" />
+              <Icon name="chevronRight" size="sm" class="text-[#a89279] transition-colors duration-500 group-hover:text-[#5a7a6b] dark:text-[#c9a88c] dark:group-hover:text-[#9ab5a6]" />
             </button>
           </div>
         </div>
 
         <!-- Charts Section -->
-        <div class="space-y-6">
+        <div class="space-y-8">
           <!-- Date Range Filter -->
-          <div class="card p-4">
-            <div class="flex flex-wrap items-center gap-4">
+          <div class="card rounded-lg p-5 transition-all">
+            <div class="flex flex-wrap items-center gap-5">
               <div class="flex items-center gap-2">
-                <span class="text-sm font-medium text-gray-700 dark:text-gray-300"
+                <span class="text-sm font-light text-[#756554] dark:text-[#c9a88c]"
                   >{{ t('admin.dashboard.timeRange') }}:</span
                 >
                 <DateRangePicker
@@ -283,7 +283,7 @@
                 {{ t('common.refresh') }}
               </button>
               <div class="ml-auto flex items-center gap-2">
-                <span class="text-sm font-medium text-gray-700 dark:text-gray-300"
+                <span class="text-sm font-light text-[#756554] dark:text-[#c9a88c]"
                   >{{ t('admin.dashboard.granularity') }}:</span
                 >
                 <div class="w-28">
@@ -298,7 +298,7 @@
           </div>
 
           <!-- Charts Grid -->
-          <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
             <ModelDistributionChart
               :model-stats="modelStats"
               :enable-ranking-view="true"
@@ -317,12 +317,12 @@
           </div>
 
           <!-- User Usage Trend (Full Width) -->
-          <div class="card p-4">
+          <div class="card rounded-lg p-5 transition-all">
             <div class="mb-4 flex items-center justify-between gap-3">
-              <h3 class="text-sm font-semibold text-gray-900 dark:text-white">{{ t('admin.dashboard.recentUsage') }} (Top 12)</h3>
+              <h3 class="text-sm font-light text-[#3d3d3d] dark:text-[#ede7e0]">{{ t('admin.dashboard.recentUsage') }} (Top 12)</h3>
               <div class="flex gap-1" role="group" :aria-label="t('admin.dashboard.recentUsage')">
                 <button v-for="metric in (['tokens', 'actual_cost'] as const)" :key="metric" type="button"
-                  class="rounded px-2 py-1 text-xs" :class="userTrendMetric === metric ? 'bg-blue-600 text-white' : 'text-gray-600 dark:text-gray-300'"
+                  class="rounded-sm px-2.5 py-1 text-xs font-light transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-[#5a7a6b]/20" :class="userTrendMetric === metric ? 'bg-[#5a7a6b]/10 text-[#3d3d3d] dark:bg-[#9ab5a6]/15 dark:text-[#ede7e0]' : 'text-[#756554] hover:text-[#3d3d3d] dark:text-[#c9a88c] dark:hover:text-[#ede7e0]'"
                   :aria-pressed="userTrendMetric === metric" @click="setUserTrendMetric(metric)">
                   {{ t(metric === 'tokens' ? 'admin.dashboard.tokens' : 'admin.dashboard.actualSpending') }}
                 </button>
@@ -335,7 +335,7 @@
               <Line v-else-if="userTrendChartData" :data="userTrendChartData" :options="lineOptions" />
               <div
                 v-else
-                class="flex h-full items-center justify-center text-sm text-gray-500 dark:text-gray-400"
+                class="flex h-full items-center justify-center text-sm font-light text-[#756554] dark:text-[#c9a88c]"
               >
                 {{ t('admin.dashboard.noDataAvailable') }}
               </div>
@@ -451,8 +451,8 @@ const isDarkMode = computed(() => {
 
 // Chart colors
 const chartColors = computed(() => ({
-  text: isDarkMode.value ? '#e5e7eb' : '#374151',
-  grid: isDarkMode.value ? '#374151' : '#e5e7eb'
+  text: isDarkMode.value ? '#c9a88c' : '#756554',
+  grid: isDarkMode.value ? '#4a4540' : '#d4cdc5'
 }))
 
 // Line chart options (for user trend chart)
@@ -549,18 +549,18 @@ const userTrendChartData = computed(() => {
 
   const sortedDates = Array.from(allDates).sort()
   const colors = [
-    '#3b82f6',
-    '#10b981',
-    '#f59e0b',
-    '#ef4444',
-    '#8b5cf6',
-    '#ec4899',
-    '#14b8a6',
-    '#f97316',
-    '#6366f1',
-    '#84cc16',
-    '#06b6d4',
-    '#a855f7'
+    '#5a7a6b',
+    '#7ba0b8',
+    '#c9a88c',
+    '#6f8b7d',
+    '#8eacbf',
+    '#d2b49b',
+    '#82998d',
+    '#a1b7c5',
+    '#d9c4b1',
+    '#93a79c',
+    '#b3c4cf',
+    '#e0d0c1'
   ]
 
   const datasets = Array.from(userGroups.values()).map((group, idx) => ({
