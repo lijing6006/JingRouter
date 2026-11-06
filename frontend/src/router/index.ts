@@ -439,6 +439,19 @@ const routes: RouteRecordRaw[] = [
     }
   },
   {
+    // 重置记录：所有登录用户可见，故不设 requiresAdmin（守卫只在 requiresAdmin
+    // 为 true 时拦非管理员）；后端读接口同样只要求登录。
+    path: '/admin/reset-logs',
+    name: 'AdminResetLogs',
+    component: () => import('@/views/admin/ResetLogView.vue'),
+    meta: {
+      requiresAuth: true,
+      title: 'Reset Logs',
+      titleKey: 'admin.resetLog.title',
+      descriptionKey: 'admin.resetLog.description'
+    }
+  },
+  {
     path: '/admin/users',
     name: 'AdminUsers',
     component: () => import('@/views/admin/UsersView.vue'),

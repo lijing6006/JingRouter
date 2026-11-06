@@ -1657,6 +1657,11 @@ func (e *MixedChannelError) Error() string {
 		e.GroupName, e.CurrentPlatform, e.OtherPlatform)
 }
 
+// SetResetLogService 注入重置记录服务（wire 调用；可选，为 nil 时不记重置日志）。
+func (s *adminServiceImpl) SetResetLogService(resetLog *ResetLogService) {
+	s.resetLog = resetLog
+}
+
 func (s *adminServiceImpl) ResetAccountQuota(ctx context.Context, id int64) error {
 	account, err := s.accountRepo.GetByID(ctx, id)
 	if err != nil {
@@ -1668,7 +1673,40 @@ func (s *adminServiceImpl) ResetAccountQuota(ctx context.Context, id int64) erro
 		return infraerrors.New(http.StatusBadRequest, "SPARK_SHADOW_NO_QUOTA_RESET",
 			"cannot reset quota for a spark shadow account; manage it on the parent account")
 	}
-	return s.accountRepo.ResetQuotaUsedAndClearRateLimitCooldown(ctx, id)
+	if err := s.accountRepo.ResetQuotaUsedAndClearRateLimitCooldown(ctx, id); err != nil {
+		return err
+	}
+	// 记重置日志：account 仍是清零前的值，在此记下重置前用量。
+	// 写失败不阻断重置（只记日志）。
+	s.recordAccountResetLog(ctx, account)
+	return nil
+}
+
+// recordAccountResetLog 写一条上游账号重置记录（best-effort）。
+func (s *adminServiceImpl) recordAccountResetLog(ctx context.Context, account *Account) {
+	if s.resetLog == nil || account == nil {
+		return
+	}
+	actor, _ := ResetActorFromContext(ctx)
+	var actorID *int64
+	if actor.UserID > 0 {
+		actorID = &actor.UserID
+	}
+	if err := s.resetLog.Record(ctx, &ResetLog{
+		ActorUserID: actorID,
+		ActorEmail:  actor.Email,
+		Kind:        ResetLogKindAccount,
+		TargetID:    account.ID,
+		TargetLabel: account.Name,
+		Windows:     map[string]bool{"quota": true},
+		AmountBefore: map[string]float64{
+			"quota_used":        account.GetQuotaUsed(),
+			"quota_daily_used":  account.GetQuotaDailyUsed(),
+			"quota_weekly_used": account.GetQuotaWeeklyUsed(),
+		},
+	}); err != nil {
+		slog.Warn("[ResetLog] record account reset failed", "error", err)
+	}
 }
 
 // EnsureOpenAIPrivacy 检查 OpenAI OAuth 账号是否已设置 privacy_mode，

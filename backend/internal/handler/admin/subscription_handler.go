@@ -200,7 +200,8 @@ func (h *SubscriptionHandler) BulkAction(c *gin.Context) {
 		return
 	}
 	executeAdminIdempotentJSONWithTimeout(c, "admin.subscriptions.bulk-action", req, service.DefaultWriteIdempotencyTTL(), 2*time.Minute, func(ctx context.Context) (any, error) {
-		return h.subscriptionService.BulkSubscriptionAction(ctx, &req)
+		// 把操作人写进 ctx（BulkSubscriptionAction 透传给 AdminResetQuota 记日志）。
+		return h.subscriptionService.BulkSubscriptionAction(withResetActor(c, ctx), &req)
 	})
 }
 
@@ -259,7 +260,7 @@ func (h *SubscriptionHandler) ResetQuota(c *gin.Context) {
 		response.BadRequest(c, "At least one of 'daily', 'weekly', or 'monthly' must be true")
 		return
 	}
-	sub, err := h.subscriptionService.AdminResetQuota(c.Request.Context(), subscriptionID, req.Daily, req.Weekly, req.Monthly)
+	sub, err := h.subscriptionService.AdminResetQuota(withResetActor(c, c.Request.Context()), subscriptionID, req.Daily, req.Weekly, req.Monthly)
 	if err != nil {
 		response.ErrorFrom(c, err)
 		return

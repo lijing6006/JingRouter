@@ -601,6 +601,53 @@ func ProvideAuditLogService(repo AuditLogRepository, settingService *SettingServ
 	return svc
 }
 
+// ProvideResetLogService 创建重置记录服务（同步落库，无后台协程）。
+func ProvideResetLogService(repo ResetLogRepository) *ResetLogService {
+	return NewResetLogService(repo)
+}
+
+// ProvideSubscriptionService 创建订阅服务并注入重置记录服务。
+func ProvideSubscriptionService(groupRepo GroupRepository, userSubRepo UserSubscriptionRepository, billingCacheService *BillingCacheService, entClient *dbent.Client, cfg *config.Config, resetLog *ResetLogService) *SubscriptionService {
+	svc := NewSubscriptionService(groupRepo, userSubRepo, billingCacheService, entClient, cfg)
+	svc.SetResetLogService(resetLog)
+	return svc
+}
+
+// ProvideAdminService 创建管理服务并注入重置记录服务。
+// 用包装函数而不改 NewAdminService 签名，避免波及直接调用它的单测。
+func ProvideAdminService(
+	cfg *config.Config,
+	userRepo UserRepository,
+	groupRepo AdminGroupRepository,
+	accountRepo AdminAccountRepository,
+	proxyRepo ProxyRepository,
+	apiKeyRepo APIKeyRepository,
+	redeemCodeRepo RedeemCodeRepository,
+	userGroupRateRepo UserGroupRateRepository,
+	userRPMCache UserRPMCache,
+	billingCacheService *BillingCacheService,
+	proxyProber ProxyExitInfoProber,
+	proxyLatencyCache ProxyLatencyCache,
+	authCacheInvalidator APIKeyAuthCacheInvalidator,
+	entClient *dbent.Client,
+	settingService *SettingService,
+	defaultSubAssigner DefaultSubscriptionAssigner,
+	userSubRepo UserSubscriptionRepository,
+	privacyClientFactory PrivacyClientFactory,
+	runtimeBlocker AccountRuntimeBlocker,
+	affiliateService *AffiliateService,
+	compositeRouteRepo CompositeModelRouteRepository,
+	compositeResolver *CompositeRouteResolver,
+	channelCacheInvalidator ChannelCacheInvalidator,
+	resetLog *ResetLogService,
+) AdminService {
+	svc := NewAdminService(cfg, userRepo, groupRepo, accountRepo, proxyRepo, apiKeyRepo, redeemCodeRepo, userGroupRateRepo, userRPMCache, billingCacheService, proxyProber, proxyLatencyCache, authCacheInvalidator, entClient, settingService, defaultSubAssigner, userSubRepo, privacyClientFactory, runtimeBlocker, affiliateService, compositeRouteRepo, compositeResolver, channelCacheInvalidator)
+	if impl, ok := svc.(*adminServiceImpl); ok {
+		impl.SetResetLogService(resetLog)
+	}
+	return svc
+}
+
 func buildIdempotencyConfig(cfg *config.Config) IdempotencyConfig {
 	idempotencyCfg := DefaultIdempotencyConfig()
 	if cfg != nil {
@@ -848,10 +895,12 @@ func ProvideAPIKeyService(
 	cfg *config.Config,
 	billingCacheService *BillingCacheService,
 	concurrencyService *ConcurrencyService,
+	resetLog *ResetLogService,
 ) *APIKeyService {
 	svc := NewAPIKeyService(apiKeyRepo, userRepo, groupRepo, userSubRepo, userGroupRateRepo, cache, cfg)
 	svc.SetRateLimitCacheInvalidator(billingCacheService)
 	svc.SetConcurrencyService(concurrencyService)
+	svc.SetResetLogService(resetLog)
 	return svc
 }
 
@@ -876,7 +925,7 @@ var ProviderSet = wire.NewSet(
 	NewBillingService,
 	ProvideBillingCacheService,
 	NewAnnouncementService,
-	NewAdminService,
+	ProvideAdminService,
 	NewGatewayService,
 	NewOpenAIGatewayService,
 	ProvideImageStorageSettingService,
@@ -926,6 +975,7 @@ var ProviderSet = wire.NewSet(
 	ProvideOpsService,
 	ProvideOpsIngressRejectAggregator,
 	ProvideAuditLogService,
+	ProvideResetLogService,
 	ProvideOpsMetricsCollector,
 	ProvideOpsAggregationService,
 	ProvideOpsAlertEvaluatorService,
@@ -937,7 +987,7 @@ var ProviderSet = wire.NewSet(
 	NewTurnstileService,
 	NewTencentCaptchaService,
 	NewAliyunCaptchaService,
-	NewSubscriptionService,
+	ProvideSubscriptionService,
 	wire.Bind(new(DefaultSubscriptionAssigner), new(*SubscriptionService)),
 	ProvideConcurrencyService,
 	ProvideUserMessageQueueService,

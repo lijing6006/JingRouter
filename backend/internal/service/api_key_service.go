@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"html"
+	"log/slog"
 	"math"
 	"sort"
 	"strconv"
@@ -288,14 +289,16 @@ type RateLimitCacheInvalidator interface {
 }
 
 type APIKeyService struct {
-	apiKeyRepo                APIKeyRepository
-	userRepo                  UserRepository
-	groupRepo                 GroupRepository
-	userSubRepo               UserSubscriptionRepository
-	userGroupRateRepo         UserGroupRateRepository
-	cache                     APIKeyCache
-	rateLimitCacheInvalid     RateLimitCacheInvalidator // optional: invalidate Redis rate limit cache
-	concurrencyService        *ConcurrencyService
+	apiKeyRepo            APIKeyRepository
+	userRepo              UserRepository
+	groupRepo             GroupRepository
+	userSubRepo           UserSubscriptionRepository
+	userGroupRateRepo     UserGroupRateRepository
+	cache                 APIKeyCache
+	rateLimitCacheInvalid RateLimitCacheInvalidator // optional: invalidate Redis rate limit cache
+	concurrencyService    *ConcurrencyService
+	// resetLog 重置记录服务（可选，wire 注入；为 nil 时不记重置日志）。
+	resetLog                  *ResetLogService
 	cfg                       *config.Config
 	authCacheL1               *ristretto.Cache
 	authNegativeCacheL1       *ristretto.Cache
@@ -372,6 +375,11 @@ func (s *APIKeyService) SetRateLimitCacheInvalidator(inv RateLimitCacheInvalidat
 
 func (s *APIKeyService) SetConcurrencyService(concurrencyService *ConcurrencyService) {
 	s.concurrencyService = concurrencyService
+}
+
+// SetResetLogService 注入重置记录服务（wire 调用；可选，为 nil 时不记重置日志）。
+func (s *APIKeyService) SetResetLogService(resetLog *ResetLogService) {
+	s.resetLog = resetLog
 }
 
 func (s *APIKeyService) compileAPIKeyIPRules(apiKey *APIKey) {
@@ -803,6 +811,14 @@ func (s *APIKeyService) Update(ctx context.Context, id int64, userID int64, req 
 		return nil, ErrInsufficientPerms
 	}
 
+	// 重置前先记下当前用量（供重置日志用；下面的分支会把 struct 原地改掉）。
+	resetQuota := req.ResetQuota != nil && *req.ResetQuota
+	resetRateLimit := req.ResetRateLimitUsage != nil && *req.ResetRateLimitUsage
+	beforeQuotaUsed := apiKey.QuotaUsed
+	beforeUsage5h := apiKey.Usage5h
+	beforeUsage1d := apiKey.Usage1d
+	beforeUsage7d := apiKey.Usage7d
+
 	// 验证 IP 白名单格式
 	if req.IPWhitelist != nil && len(*req.IPWhitelist) > 0 {
 		if invalid := ip.ValidateIPPatterns(*req.IPWhitelist); len(invalid) > 0 {
@@ -911,7 +927,6 @@ func (s *APIKeyService) Update(ctx context.Context, id int64, userID int64, req 
 		apiKey.RateLimit7d = *req.RateLimit7d
 		fields.RateLimits = true
 	}
-	resetRateLimit := req.ResetRateLimitUsage != nil && *req.ResetRateLimitUsage
 	if resetRateLimit {
 		apiKey.Usage5h = 0
 		apiKey.Usage1d = 0
@@ -939,7 +954,48 @@ func (s *APIKeyService) Update(ctx context.Context, id int64, userID int64, req 
 		_ = s.rateLimitCacheInvalid.InvalidateAPIKeyRateLimit(ctx, apiKey.ID)
 	}
 
+	// 记重置日志（best-effort：写失败不阻断更新）。
+	if resetQuota || resetRateLimit {
+		s.recordAPIKeyResetLog(ctx, apiKey, resetQuota, resetRateLimit,
+			beforeQuotaUsed, beforeUsage5h, beforeUsage1d, beforeUsage7d)
+	}
+
 	return apiKey, nil
+}
+
+// recordAPIKeyResetLog 写一条 API 密钥重置记录（best-effort）。
+func (s *APIKeyService) recordAPIKeyResetLog(ctx context.Context, apiKey *APIKey, resetQuota, resetRateLimit bool, beforeQuotaUsed, beforeUsage5h, beforeUsage1d, beforeUsage7d float64) {
+	if s.resetLog == nil || apiKey == nil {
+		return
+	}
+	actor, _ := ResetActorFromContext(ctx)
+	windows := make(map[string]bool, 2)
+	amountBefore := make(map[string]float64, 4)
+	if resetQuota {
+		windows["quota"] = true
+		amountBefore["quota_used"] = beforeQuotaUsed
+	}
+	if resetRateLimit {
+		windows["rate_limit"] = true
+		amountBefore["usage_5h"] = beforeUsage5h
+		amountBefore["usage_1d"] = beforeUsage1d
+		amountBefore["usage_7d"] = beforeUsage7d
+	}
+	var actorID *int64
+	if actor.UserID > 0 {
+		actorID = &actor.UserID
+	}
+	if err := s.resetLog.Record(ctx, &ResetLog{
+		ActorUserID:  actorID,
+		ActorEmail:   actor.Email,
+		Kind:         ResetLogKindAPIKey,
+		TargetID:     apiKey.ID,
+		TargetLabel:  apiKey.Name,
+		Windows:      windows,
+		AmountBefore: amountBefore,
+	}); err != nil {
+		slog.Warn("[ResetLog] record api key reset failed", "error", err)
+	}
 }
 
 // Delete 删除API Key

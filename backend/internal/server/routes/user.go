@@ -154,5 +154,13 @@ func RegisterUserRoutes(
 			monitorV2.GET("/errors", h.ChannelMonitorV2.Errors)
 			monitorV2.GET("/users", h.ChannelMonitorV2.Users)
 		}
+
+		// 重置记录（所有登录用户可见，不限管理员）：刻意挂在用户认证组，
+		// 而不是 admin 组（admin 组有 adminAuth 中间件，会挡住普通登录用户）。
+		// 重置操作本身仍在 admin 组、保持 admin-only。
+		resetLogs := authenticated.Group("/admin")
+		{
+			resetLogs.GET("/reset-logs", h.Admin.ResetLog.List)
+		}
 	}
 }

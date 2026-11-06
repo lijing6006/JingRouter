@@ -48,6 +48,8 @@ type SubscriptionService struct {
 	userSubRepo         UserSubscriptionRepository
 	billingCacheService *BillingCacheService
 	entClient           *dbent.Client
+	// resetLog 重置记录服务（可选，wire 注入；为 nil 时不记重置日志）。
+	resetLog *ResetLogService
 
 	// L1 缓存：加速中间件热路径的订阅查询
 	subCacheL1     *ristretto.Cache
@@ -72,6 +74,53 @@ func NewSubscriptionService(groupRepo GroupRepository, userSubRepo UserSubscript
 	svc.initMaintenanceQueue(cfg)
 	svc.StartSubCacheInvalidationSubscriber(context.Background())
 	return svc
+}
+
+// SetResetLogService 注入重置记录服务（wire 调用；可选，为 nil 时不记重置日志）。
+func (s *SubscriptionService) SetResetLogService(resetLog *ResetLogService) {
+	s.resetLog = resetLog
+}
+
+// recordResetLog 写一条订阅重置记录（best-effort：失败只记日志，绝不阻断重置）。
+// 调用方须在清零前传入重置前的 sub（ResetUsageWindows 不改 struct，只改库）。
+func (s *SubscriptionService) recordResetLog(ctx context.Context, sub *UserSubscription, resetDaily, resetWeekly, resetMonthly bool) {
+	if s.resetLog == nil || sub == nil {
+		return
+	}
+	actor, _ := ResetActorFromContext(ctx)
+	windows := make(map[string]bool, 3)
+	amountBefore := make(map[string]float64, 3)
+	if resetDaily {
+		windows["daily"] = true
+		amountBefore["daily"] = sub.DailyUsageUSD
+	}
+	if resetWeekly {
+		windows["weekly"] = true
+		amountBefore["weekly"] = sub.WeeklyUsageUSD
+	}
+	if resetMonthly {
+		windows["monthly"] = true
+		amountBefore["monthly"] = sub.MonthlyUsageUSD
+	}
+	targetLabel := ""
+	if sub.User != nil {
+		targetLabel = sub.User.Email
+	}
+	var actorID *int64
+	if actor.UserID > 0 {
+		actorID = &actor.UserID
+	}
+	if err := s.resetLog.Record(ctx, &ResetLog{
+		ActorUserID:  actorID,
+		ActorEmail:   actor.Email,
+		Kind:         ResetLogKindSubscription,
+		TargetID:     sub.ID,
+		TargetLabel:  targetLabel,
+		Windows:      windows,
+		AmountBefore: amountBefore,
+	}); err != nil {
+		log.Printf("[ResetLog] record subscription reset failed: %v", err)
+	}
 }
 
 func (s *SubscriptionService) initMaintenanceQueue(cfg *config.Config) {
@@ -905,6 +954,9 @@ func (s *SubscriptionService) AdminResetQuota(ctx context.Context, subscriptionI
 	if s.billingCacheService != nil {
 		_ = s.billingCacheService.InvalidateSubscription(ctx, sub.UserID, sub.GroupID)
 	}
+	// 记重置日志：sub 仍是清零前的值（ResetUsageWindows 只改库不改 struct），
+	// 在此记下重置前用量。写失败不阻断重置（recordResetLog 内部只记日志）。
+	s.recordResetLog(ctx, sub, resetDaily, resetWeekly, resetMonthly)
 	// Return the refreshed subscription from DB
 	return s.userSubRepo.GetByID(ctx, subscriptionID)
 }

@@ -36,6 +36,7 @@ import affiliatesAPI from './affiliates'
 import riskControlAPI from './riskControl'
 import adminComplianceAPI from './compliance'
 import auditAPI from './audit'
+import resetLogAPI from './resetLog'
 import pluginsAPI from './plugins'
 
 /**
@@ -75,6 +76,7 @@ export const adminAPI = {
   riskControl: riskControlAPI,
   compliance: adminComplianceAPI,
   audit: auditAPI,
+  resetLog: resetLogAPI,
   plugins: pluginsAPI
 }
 
@@ -112,6 +114,7 @@ export {
   riskControlAPI,
   adminComplianceAPI,
   auditAPI,
+  resetLogAPI,
   pluginsAPI
 }
 
@@ -120,6 +123,7 @@ export default adminAPI
 // Re-export types used by components
 export type { WorkbuddyQuotaWindow, WorkbuddyQuotaAccount, WorkbuddyQuotaResult, WorkbuddyCheckinResult } from './workbuddy'
 export type { AuditLog, AuditLogQuery, AuditLogListResponse } from './audit'
+export type { ResetLog, ResetLogKind, ResetLogQuery, ResetLogListResponse } from './resetLog'
 export type { BalanceHistoryItem } from './users'
 export type { ErrorPassthroughRule, CreateRuleRequest, UpdateRuleRequest } from './errorPassthrough'
 export type { BackupAgentHealth, DataManagementConfig } from './dataManagement'

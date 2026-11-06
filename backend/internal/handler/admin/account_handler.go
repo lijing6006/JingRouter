@@ -2610,7 +2610,7 @@ func (h *AccountHandler) ResetQuota(c *gin.Context) {
 		return
 	}
 
-	if err := h.adminService.ResetAccountQuota(c.Request.Context(), accountID); err != nil {
+	if err := h.adminService.ResetAccountQuota(withResetActor(c, c.Request.Context()), accountID); err != nil {
 		response.ErrorFrom(c, err)
 		return
 	}

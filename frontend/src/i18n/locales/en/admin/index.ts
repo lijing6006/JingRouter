@@ -5,6 +5,7 @@ import resources from './resources'
 import ops from './ops'
 import settings from './settings'
 import audit from './audit'
+import resetLog from './resetLog'
 import promptAudit from './promptAudit'
 import plugins from './plugins'
 import workbuddy from './workbuddy'
@@ -17,6 +18,7 @@ export default {
   ...ops,
   ...settings,
   ...audit,
+  ...resetLog,
   ...promptAudit,
   ...plugins,
   ...workbuddy,

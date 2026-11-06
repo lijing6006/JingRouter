@@ -852,7 +852,9 @@ const adminNavItems = computed((): NavItem[] => {
       ],
     },
     { path: '/admin/usage', label: t('nav.usage'), icon: ChartIcon, menuKey: 'usage' },
-    { path: '/admin/audit-logs', label: t('nav.auditLogs'), icon: ShieldIcon, hideInSimpleMode: true, menuKey: 'audit-logs' }
+    { path: '/admin/audit-logs', label: t('nav.auditLogs'), icon: ShieldIcon, hideInSimpleMode: true, menuKey: 'audit-logs' },
+    // 重置记录：没有 menuKey，永远显示（不在 15 个可隐藏菜单里），跟「系统设置」一样藏不掉。
+    { path: '/admin/reset-logs', label: t('nav.resetLogs'), icon: ShieldIcon }
   ]
 
   // 先过功能开关，再过「菜单显示」配置；「系统设置」没有 menuKey，永远保留。

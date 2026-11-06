@@ -717,6 +717,8 @@ type adminServiceImpl struct {
 	compositeResolver    *CompositeRouteResolver
 	// 分组平台变更后用来失效渠道缓存；可为 nil（缓存会在 TTL 到期后自然重建）
 	channelCacheInvalidator ChannelCacheInvalidator
+	// resetLog 重置记录服务（可选，wire 注入；为 nil 时不记重置日志）。
+	resetLog *ResetLogService
 }
 
 // ChannelCacheInvalidator 失效渠道缓存。

@@ -284,7 +284,9 @@ func (h *APIKeyHandler) Update(c *gin.Context) {
 		}
 	}
 
-	key, err := h.apiKeyService.Update(c.Request.Context(), keyID, subject.UserID, svcReq)
+	// 把操作人写进 ctx（APIKeyService.Update 透传给重置日志）。
+	ctx := service.WithResetActor(c.Request.Context(), subject.UserID, c.GetString(middleware2.ContextKeyAuthEmail))
+	key, err := h.apiKeyService.Update(ctx, keyID, subject.UserID, svcReq)
 	if err != nil {
 		response.ErrorFrom(c, err)
 		return
