@@ -11,7 +11,7 @@
       <!-- Custom Logo or Default Logo -->
       <router-link
         :to="homePath"
-        class="sidebar-logo flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl shadow-glow transition-opacity hover:opacity-80"
+        class="sidebar-logo flex h-9 w-9 items-center justify-center overflow-hidden rounded-sm transition-opacity duration-500 hover:opacity-80"
         @click="handleMenuItemClick(homePath)"
       >
         <img v-if="settingsLoaded" :src="siteLogo || '/logo.svg'" alt="Logo" class="h-full w-full object-contain" />
@@ -19,7 +19,7 @@
       <div class="sidebar-brand" :class="{ 'sidebar-brand-collapsed': sidebarCollapsed }" :aria-hidden="sidebarCollapsed ? 'true' : 'false'">
         <router-link
           :to="homePath"
-          class="sidebar-brand-title text-lg font-bold text-gray-900 transition-colors hover:text-primary-600 dark:text-white dark:hover:text-primary-400"
+          class="sidebar-brand-title text-lg font-light tracking-wide text-[#3d3d3d] transition-colors duration-500 hover:text-[#4f6b5e] dark:text-[#ede7e0] dark:hover:text-[#b6cddd]"
           @click="handleMenuItemClick(homePath)"
         >
           {{ siteName }}
@@ -56,13 +56,13 @@
                 >
                   <span class="min-w-0 truncate">{{ item.label }}</span>
                   <ChevronDownIcon
-                    class="h-4 w-4 flex-shrink-0 transition-transform duration-200"
+                    class="h-4 w-4 flex-shrink-0 transition-transform duration-500 ease-in-out"
                     :class="isGroupExpanded(item) ? 'rotate-180' : ''"
                   />
                 </span>
               </button>
               <!-- Children -->
-              <div v-if="!sidebarCollapsed && isGroupExpanded(item)" class="mb-1 ml-4 border-l border-gray-200 pl-2 dark:border-dark-600">
+              <div v-if="!sidebarCollapsed && isGroupExpanded(item)" class="mb-1 ml-4 border-l border-[#d4cdc5]/40 pl-2 dark:border-[#4a4540]">
                 <router-link
                   v-for="child in item.children"
                   :key="child.path"
@@ -148,7 +148,7 @@
     </nav>
 
     <!-- Bottom Section -->
-    <div class="mt-auto border-t border-gray-100 p-3 dark:border-dark-800">
+    <div class="mt-auto border-t border-[#d4cdc5]/40 p-3 dark:border-[#4a4540]">
       <!-- Theme Toggle -->
       <button
         @click="toggleTheme"
@@ -156,7 +156,7 @@
         :class="{ 'sidebar-link-collapsed': sidebarCollapsed }"
         :title="sidebarCollapsed ? (isDark ? t('nav.lightMode') : t('nav.darkMode')) : undefined"
       >
-        <SunIcon v-if="isDark" class="h-5 w-5 flex-shrink-0 text-amber-500" />
+        <SunIcon v-if="isDark" class="h-5 w-5 flex-shrink-0 text-[#c9a88c]" />
         <MoonIcon v-else class="h-5 w-5 flex-shrink-0" />
         <span class="sidebar-label" :class="{ 'sidebar-label-collapsed': sidebarCollapsed }" :aria-hidden="sidebarCollapsed ? 'true' : 'false'">{{
           isDark ? t('nav.lightMode') : t('nav.darkMode')
@@ -181,7 +181,7 @@
   <transition name="fade">
     <div
       v-if="mobileOpen"
-      class="fixed inset-0 z-30 bg-black/50 lg:hidden"
+      class="fixed inset-0 z-30 bg-[#3d3d3d]/30 dark:bg-[#242321]/65 lg:hidden"
       @click="closeMobile"
     ></div>
   </transition>
@@ -1011,9 +1011,9 @@ onBeforeUnmount(() => {
   flex: 1 1 auto;
   white-space: nowrap;
   transition:
-    max-width 0.22s ease,
-    opacity 0.14s ease,
-    transform 0.14s ease;
+    max-width 0.5s ease-in-out,
+    opacity 0.4s ease-in-out,
+    transform 0.4s ease-in-out;
   max-width: 12rem;
 }
 
@@ -1053,8 +1053,8 @@ onBeforeUnmount(() => {
   text-overflow: ellipsis;
   white-space: nowrap;
   transition:
-    opacity 0.16s ease,
-    transform 0.16s ease;
+    opacity 0.4s ease-in-out,
+    transform 0.4s ease-in-out;
 }
 
 .sidebar-section-title::after {
@@ -1064,14 +1064,14 @@ onBeforeUnmount(() => {
   right: 0.75rem;
   top: 50%;
   height: 1px;
-  background: rgb(229 231 235);
+  background: rgb(212 205 197 / 0.6);
   opacity: 0;
   transform: translateY(-50%);
-  transition: opacity 0.18s ease;
+  transition: opacity 0.4s ease-in-out;
 }
 
 .dark .sidebar-section-title::after {
-  background: rgb(55 65 81);
+  background: rgb(74 69 64);
 }
 
 .sidebar-section-title-text-collapsed {
@@ -1091,9 +1091,9 @@ onBeforeUnmount(() => {
   text-overflow: ellipsis;
   white-space: nowrap;
   transition:
-    max-width 0.2s ease,
-    opacity 0.12s ease,
-    transform 0.12s ease;
+    max-width 0.5s ease-in-out,
+    opacity 0.4s ease-in-out,
+    transform 0.4s ease-in-out;
   max-width: 12rem;
 }
 

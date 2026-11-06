@@ -1,6 +1,6 @@
 <template>
-  <header class="glass sticky top-0 z-30 border-b border-gray-200/50 dark:border-dark-700/50">
-    <div class="flex h-16 items-center justify-between gap-2 px-2 sm:px-4 md:px-6">
+  <header class="sticky top-0 z-30 border-b border-[#d4cdc5]/40 bg-[#f5f0eb] dark:border-[#4a4540] dark:bg-[#242321]">
+    <div class="flex h-16 items-center justify-between gap-2 px-4 sm:px-6 md:px-8">
       <!-- Left: Mobile Menu Toggle + Page Title -->
       <div class="flex shrink-0 items-center gap-2 sm:gap-4">
         <button
@@ -12,10 +12,10 @@
         </button>
 
         <div class="hidden lg:block">
-          <h1 class="text-lg font-semibold text-gray-900 dark:text-white">
+          <h1 class="text-lg font-light tracking-wide text-[#3d3d3d] dark:text-[#ede7e0]">
             {{ pageTitle }}
           </h1>
-          <p v-if="pageDescription" class="text-xs text-gray-500 dark:text-dark-400">
+          <p v-if="pageDescription" class="text-xs font-light text-[#756554] dark:text-[#c9a88c]">
             {{ pageDescription }}
           </p>
         </div>
@@ -32,7 +32,7 @@
           :href="docUrl"
           target="_blank"
           rel="noopener noreferrer"
-          class="hidden items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-dark-400 dark:hover:bg-dark-800 dark:hover:text-white sm:flex"
+          class="hidden items-center gap-1.5 rounded-sm px-2.5 py-1.5 text-sm font-light lowercase tracking-wide text-[#756554] transition-colors duration-500 hover:bg-[#ede7e0]/60 hover:text-[#3d3d3d] dark:text-[#c9a88c] dark:hover:bg-[#3a3733] dark:hover:text-[#ede7e0] sm:flex"
         >
           <Icon name="book" size="sm" />
           <span class="hidden sm:inline">{{ t('nav.docs') }}</span>
@@ -44,7 +44,7 @@
           :to="{ path: '/model-plaza', query: { embedded: '1' } }"
           :title="t('nav.modelPlaza')"
           :aria-label="t('nav.modelPlaza')"
-          class="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-dark-400 dark:hover:bg-dark-800 dark:hover:text-white"
+          class="flex items-center gap-1.5 rounded-sm px-2.5 py-1.5 text-sm font-light lowercase tracking-wide text-[#756554] transition-colors duration-500 hover:bg-[#ede7e0]/60 hover:text-[#3d3d3d] dark:text-[#c9a88c] dark:hover:bg-[#3a3733] dark:hover:text-[#ede7e0]"
         >
           <Icon name="grid" size="sm" />
           <span class="hidden sm:inline">{{ t('nav.modelPlaza') }}</span>
@@ -59,10 +59,10 @@
         <!-- Balance Display -->
         <div
           v-if="user"
-          class="group relative hidden items-center gap-2 rounded-xl bg-primary-50 px-3 py-1.5 dark:bg-primary-900/20 sm:flex"
+          class="group relative hidden items-center gap-2 rounded-sm border border-[#d4cdc5]/40 bg-white px-3 py-1.5 transition-colors duration-500 hover:border-[#d4cdc5] dark:border-[#4a4540] dark:bg-[#2f2d2a] dark:hover:border-[#6f6a64] sm:flex"
         >
           <svg
-            class="h-4 w-4 text-primary-600 dark:text-primary-400"
+            class="h-4 w-4 text-[#4f6b5e] dark:text-[#b6cddd]"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -74,30 +74,30 @@
               d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"
             />
           </svg>
-          <span class="text-sm font-semibold text-primary-700 dark:text-primary-300">
+          <span class="text-sm font-light tracking-wide text-[#4f6b5e] dark:text-[#b6cddd]">
             {{ formatHeaderMoney(availableBalance) }}
           </span>
           <span
             v-if="frozenBalance > 0"
-            class="rounded-full bg-amber-100 px-1.5 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-900/40 dark:text-amber-200"
+            class="rounded-sm bg-[#a89279]/15 px-1.5 py-0.5 text-xs font-light text-[#756554] dark:bg-[#c9a88c]/15 dark:text-[#c9a88c]"
           >
             {{ balanceFrozenLabel }}
           </span>
           <div
-            class="pointer-events-none absolute right-0 top-full mt-2 hidden w-56 rounded-lg border border-gray-200 bg-white p-3 text-xs shadow-lg group-hover:block dark:border-dark-700 dark:bg-dark-800"
+            class="pointer-events-none absolute right-0 top-full mt-2 hidden w-56 rounded-sm border border-[#d4cdc5]/40 bg-white p-3 text-xs shadow-sm group-hover:block dark:border-[#4a4540] dark:bg-[#2f2d2a]"
           >
             <div class="flex items-center justify-between">
-              <span class="text-gray-500 dark:text-dark-400">{{ balanceAvailableText }}</span>
-              <span class="font-medium text-gray-900 dark:text-white">{{ formatHeaderMoney(availableBalance) }}</span>
+              <span class="text-[#756554] dark:text-[#c9a88c]">{{ balanceAvailableText }}</span>
+              <span class="font-light text-[#3d3d3d] dark:text-[#ede7e0]">{{ formatHeaderMoney(availableBalance) }}</span>
             </div>
             <div class="mt-2 flex items-center justify-between">
-              <span class="text-gray-500 dark:text-dark-400">{{ balanceFrozenText }}</span>
-              <span class="font-medium text-amber-700 dark:text-amber-200">{{ formatHeaderMoney(frozenBalance) }}</span>
+              <span class="text-[#756554] dark:text-[#c9a88c]">{{ balanceFrozenText }}</span>
+              <span class="font-light text-[#756554] dark:text-[#c9a88c]">{{ formatHeaderMoney(frozenBalance) }}</span>
             </div>
-            <div class="mt-2 border-t border-gray-100 pt-2 dark:border-dark-700">
+            <div class="mt-2 border-t border-[#d4cdc5]/40 pt-2 dark:border-[#4a4540]">
               <div class="flex items-center justify-between">
-                <span class="text-gray-500 dark:text-dark-400">{{ balanceTotalText }}</span>
-                <span class="font-semibold text-gray-900 dark:text-white">{{ formatHeaderMoney(totalBalance) }}</span>
+                <span class="text-[#756554] dark:text-[#c9a88c]">{{ balanceTotalText }}</span>
+                <span class="font-light text-[#3d3d3d] dark:text-[#ede7e0]">{{ formatHeaderMoney(totalBalance) }}</span>
               </div>
             </div>
           </div>
@@ -107,10 +107,10 @@
         <div v-if="user" class="relative" ref="dropdownRef">
           <button
             @click="toggleDropdown"
-            class="flex items-center gap-2 rounded-xl p-1.5 transition-colors hover:bg-gray-100 dark:hover:bg-dark-800"
+            class="flex items-center gap-2 rounded-sm p-1.5 transition-colors duration-500 hover:bg-[#ede7e0]/60 dark:hover:bg-[#3a3733]"
             :aria-label="t('common.userMenu')"
           >
-            <div class="flex h-8 w-8 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 text-sm font-medium text-white shadow-sm">
+            <div class="flex h-8 w-8 items-center justify-center overflow-hidden rounded-sm bg-[#5a7a6b]/15 text-sm font-light text-[#4f6b5e] dark:bg-[#9ab5a6]/15 dark:text-[#b6cddd]">
               <img
                 v-if="avatarUrl"
                 :src="avatarUrl"
@@ -120,36 +120,36 @@
               <span v-else>{{ userInitials }}</span>
             </div>
             <div class="hidden text-left md:block">
-              <div class="text-sm font-medium text-gray-900 dark:text-white">
+              <div class="text-sm font-light text-[#3d3d3d] dark:text-[#ede7e0]">
                 {{ displayName }}
               </div>
-              <div class="text-xs text-gray-500 dark:text-dark-400">
+              <div class="text-xs font-light text-[#756554] dark:text-[#c9a88c]">
                 {{ t('admin.users.roles.' + user.role) }}
               </div>
             </div>
-            <Icon name="chevronDown" size="sm" class="hidden text-gray-400 md:block" />
+            <Icon name="chevronDown" size="sm" class="hidden text-[#756554] dark:text-[#c9a88c] md:block" />
           </button>
 
           <!-- Dropdown Menu -->
           <transition name="dropdown">
             <div v-if="dropdownOpen" class="dropdown right-0 mt-2 w-56">
               <!-- User Info -->
-              <div class="border-b border-gray-100 px-4 py-3 dark:border-dark-700">
-                <div class="text-sm font-medium text-gray-900 dark:text-white">
+              <div class="border-b border-[#d4cdc5]/40 px-4 py-3 dark:border-[#4a4540]">
+                <div class="text-sm font-light text-[#3d3d3d] dark:text-[#ede7e0]">
                   {{ displayName }}
                 </div>
-                <div class="text-xs text-gray-500 dark:text-dark-400">{{ user.email }}</div>
+                <div class="text-xs font-light text-[#756554] dark:text-[#c9a88c]">{{ user.email }}</div>
               </div>
 
               <!-- Balance (mobile only) -->
-              <div class="border-b border-gray-100 px-4 py-2 dark:border-dark-700 sm:hidden">
-                <div class="text-xs text-gray-500 dark:text-dark-400">
+              <div class="border-b border-[#d4cdc5]/40 px-4 py-2 dark:border-[#4a4540] sm:hidden">
+                <div class="text-xs font-light text-[#756554] dark:text-[#c9a88c]">
                   {{ t('common.balance') }}
                 </div>
-                <div class="text-sm font-semibold text-primary-600 dark:text-primary-400">
+                <div class="text-sm font-light text-[#4f6b5e] dark:text-[#b6cddd]">
                   {{ formatHeaderMoney(availableBalance) }}
                 </div>
-                <div v-if="frozenBalance > 0" class="mt-1 text-xs text-amber-600 dark:text-amber-300">
+                <div v-if="frozenBalance > 0" class="mt-1 text-xs font-light text-[#756554] dark:text-[#c9a88c]">
                   {{ balanceFrozenText }} {{ formatHeaderMoney(frozenBalance) }}
                 </div>
               </div>
@@ -188,9 +188,9 @@
               <!-- Contact Support (only show if configured) -->
               <div
                 v-if="contactInfo"
-                class="border-t border-gray-100 px-4 py-2.5 dark:border-dark-700"
+                class="border-t border-[#d4cdc5]/40 px-4 py-2.5 dark:border-[#4a4540]"
               >
-                <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                <div class="flex items-center gap-2 text-xs font-light text-[#756554] dark:text-[#c9a88c]">
                   <svg
                     class="h-3.5 w-3.5 flex-shrink-0"
                     fill="none"
@@ -205,13 +205,13 @@
                     />
                   </svg>
                   <span>{{ t('common.contactSupport') }}:</span>
-                  <span class="font-medium text-gray-700 dark:text-gray-300">{{
+                  <span class="font-light text-[#3d3d3d] dark:text-[#ede7e0]">{{
                     contactInfo
                   }}</span>
                 </div>
               </div>
 
-              <div v-if="showOnboardingButton" class="border-t border-gray-100 py-1 dark:border-dark-700">
+              <div v-if="showOnboardingButton" class="border-t border-[#d4cdc5]/40 py-1 dark:border-[#4a4540]">
                 <button @click="handleReplayGuide" class="dropdown-item w-full">
                   <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
                     <path
@@ -222,10 +222,10 @@
                 </button>
               </div>
 
-              <div class="border-t border-gray-100 py-1 dark:border-dark-700">
+              <div class="border-t border-[#d4cdc5]/40 py-1 dark:border-[#4a4540]">
                 <button
                   @click="handleLogout"
-                  class="dropdown-item w-full text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
+                  class="dropdown-item w-full text-[#8b5e52] hover:bg-[#8b5e52]/10 dark:text-[#c99b90] dark:hover:bg-[#c99b90]/10"
                 >
                   <svg
                     class="h-4 w-4"
@@ -396,12 +396,12 @@ onBeforeUnmount(() => {
 <style scoped>
 .dropdown-enter-active,
 .dropdown-leave-active {
-  transition: all 0.2s ease;
+  transition: opacity 0.5s ease-in-out;
 }
 
 .dropdown-enter-from,
 .dropdown-leave-to {
   opacity: 0;
-  transform: scale(0.95) translateY(-4px);
+  transform: translateY(-4px);
 }
 </style>

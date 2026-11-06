@@ -3,10 +3,10 @@
     <div class="space-y-6">
       <!-- Title -->
       <div class="text-center">
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+        <h2 class="text-2xl font-light tracking-wide text-[#3d3d3d] dark:text-[#ede7e0]">
           {{ t('auth.welcomeBack') }}
         </h2>
-        <p class="mt-2 text-sm text-gray-500 dark:text-dark-400">
+        <p class="mt-2 text-sm font-light text-[#756554] dark:text-[#c9a88c]">
           {{ t('auth.signInToAccount') }}
         </p>
       </div>
@@ -19,7 +19,7 @@
           </label>
           <div class="relative">
             <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
-              <Icon name="mail" size="md" class="text-gray-400 dark:text-dark-500" />
+              <Icon name="mail" size="md" class="text-[#756554] dark:text-[#c9a88c]" />
             </div>
             <input
               id="email"
@@ -43,7 +43,7 @@
           </label>
           <div class="relative">
             <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
-              <Icon name="lock" size="md" class="text-gray-400 dark:text-dark-500" />
+              <Icon name="lock" size="md" class="text-[#756554] dark:text-[#c9a88c]" />
             </div>
             <input
               id="password"
@@ -60,7 +60,7 @@
               type="button"
               @click="showPassword = !showPassword"
               :disabled="authActionDisabled"
-              class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-400 transition-colors hover:text-gray-600 dark:hover:text-dark-300"
+              class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-[#756554] transition-colors duration-500 hover:text-[#3d3d3d] dark:text-[#c9a88c] dark:hover:text-[#ede7e0]"
             >
               <Icon v-if="showPassword" name="eyeOff" size="md" />
               <Icon v-else name="eye" size="md" />
@@ -71,7 +71,7 @@
             <router-link
               v-if="passwordResetEnabled && !backendModeEnabled"
               to="/forgot-password"
-              class="text-sm font-medium text-primary-600 transition-colors hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
+              class="text-sm font-light lowercase tracking-wide text-[#756554] transition-colors duration-500 hover:text-[#3d3d3d] dark:text-[#c9a88c] dark:hover:text-[#ede7e0]"
             >
               {{ t('auth.forgotPassword') }}
             </router-link>
@@ -105,7 +105,7 @@
         >
           <svg
             v-if="isLoading"
-            class="-ml-1 mr-2 h-4 w-4 animate-spin text-white"
+            class="-ml-1 mr-2 h-4 w-4 animate-spin text-[#f5f0eb] dark:text-[#2f2d2a]"
             fill="none"
             viewBox="0 0 24 24"
           >
@@ -141,11 +141,11 @@
 
         <div v-if="showPasskeyLogin || showOAuthLogin" class="space-y-3 pt-1">
           <div class="flex items-center gap-3">
-            <div class="h-px flex-1 bg-gray-200 dark:bg-dark-700"></div>
-            <span class="text-xs text-gray-500 dark:text-dark-400">
+            <div class="h-px flex-1 bg-[#d4cdc5]/40 dark:bg-[#4a4540]"></div>
+            <span class="text-xs font-light lowercase tracking-wide text-[#756554] dark:text-[#c9a88c]">
               {{ t('auth.oauthOrContinue') }}
             </span>
-            <div class="h-px flex-1 bg-gray-200 dark:bg-dark-700"></div>
+            <div class="h-px flex-1 bg-[#d4cdc5]/40 dark:bg-[#4a4540]"></div>
           </div>
 
           <button
@@ -198,11 +198,11 @@
 
     <!-- Footer -->
     <template v-if="!backendModeEnabled && publicSettingsLoaded && registrationEnabled" #footer>
-      <p class="text-gray-500 dark:text-dark-400">
+      <p class="font-light text-[#756554] dark:text-[#c9a88c]">
         {{ t('auth.dontHaveAccount') }}
         <router-link
           to="/register"
-          class="font-medium text-primary-600 transition-colors hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
+          class="font-light lowercase tracking-wide text-[#756554] transition-colors duration-500 hover:text-[#3d3d3d] dark:text-[#c9a88c] dark:hover:text-[#ede7e0]"
         >
           {{ t('auth.signUp') }}
         </router-link>
@@ -736,7 +736,7 @@ function handle2FACancel(): void {
 <style scoped>
 .fade-enter-active,
 .fade-leave-active {
-  transition: all 0.3s ease;
+  transition: opacity 0.5s ease-in-out;
 }
 
 .fade-enter-from,
