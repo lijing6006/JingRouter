@@ -293,11 +293,11 @@ const checkinError = ref('')
 const togglingKey = ref<string | null>(null)
 
 /**
- * Magpie-WorkBuddy 上游（账号 id 3）所绑的分组，每行相同：
- * 国模（14）、Workbuddy国模分组（17）、ChatGPT订阅（13）。
+ * Magpie-WorkBuddy 上游（账号 id 3）所绑的分组，每行相同。
+ * 2026-11-06 用户清理分组后只剩一个用户分组：ChatGPT订阅（13）。
  * 分组绑定不常变，若后台改了绑定，这里须同步改。
  */
-const workbuddyGroups = ['国模', 'Workbuddy国模分组', 'ChatGPT订阅']
+const workbuddyGroups = ['ChatGPT订阅']
 
 /** 表格列：与 账号管理 保持一致的列名与顺序（无选择框与 ID 列）。 */
 const cols = computed<Column[]>(() => [
