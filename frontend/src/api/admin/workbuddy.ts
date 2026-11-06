@@ -31,6 +31,10 @@ export interface WorkbuddyQuotaAccount {
   kind?: string
   read_at?: string
   windows: WorkbuddyQuotaWindow[]
+  /** Magpie 签到开关的 key（如 "workbuddy|workbuddy#wycm4m"），为空表示未知（后端未配 WEB_KEY），此时调度开关只读。 */
+  checkin_key?: string
+  /** 该账号的每日签到开关是否开启（仅当 checkin_key 非空时有效）。 */
+  checkin_enabled?: boolean
 }
 
 /** 全部 WorkBuddy 账号的额度快照（对齐后端 WorkbuddyQuotaResult）。 */
@@ -67,7 +71,16 @@ export async function checkinWorkbuddyAccounts(): Promise<WorkbuddyCheckinResult
   return data || []
 }
 
+/**
+ * 设置单个 WorkBuddy 账号的每日签到开关（调 Magpie 的签到开关接口）。
+ * 只改该账号是否参与每日签到，不会立即触发一次签到；开关状态实时生效。
+ */
+export async function setCheckinEnabled(key: string, on: boolean): Promise<void> {
+  await apiClient.post('/admin/workbuddy/checkin-account', { key, on })
+}
+
 export default {
   getWorkbuddyAccounts,
-  checkinWorkbuddyAccounts
+  checkinWorkbuddyAccounts,
+  setCheckinEnabled
 }

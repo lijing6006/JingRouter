@@ -529,6 +529,8 @@ func registerWorkbuddyRoutes(admin *gin.RouterGroup, h *handler.Handlers) {
 		wb.GET("/accounts", h.Admin.Workbuddy.ListAccounts)
 		// 触发一次 Magpie WorkBuddy 签到（覆盖全部已开启的账号，幂等）。
 		wb.POST("/checkin", h.Admin.Workbuddy.Checkin)
+		// 单个 WorkBuddy 账号的签到开关（调 Magpie POST /api/settings/checkin-account）。
+		wb.POST("/checkin-account", h.Admin.Workbuddy.SetCheckinEnabled)
 	}
 }
 

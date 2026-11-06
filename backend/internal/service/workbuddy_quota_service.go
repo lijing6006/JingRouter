@@ -27,6 +27,9 @@ const (
 	workbuddyWebCookieName = "magpie_web_3430"
 	// workbuddyQuotaMaxBodyBytes Magpie 额度接口响应体上限（4 个账号的窗口数据很小）。
 	workbuddyQuotaMaxBodyBytes = 256 * 1024
+	// workbuddySettingsMaxBodyBytes Magpie 设置接口响应体上限：GET /api/settings
+	// 返回整份设置（含各插件的 schema），比额度接口大得多，放宽到 2MB。
+	workbuddySettingsMaxBodyBytes = 2 * 1024 * 1024
 	// workbuddyQuotaSingleflightKey 并发去重 key。
 	workbuddyQuotaSingleflightKey = "workbuddy-quotas"
 )
@@ -49,13 +52,32 @@ type WorkbuddyQuotaWindow struct {
 
 // WorkbuddyQuotaAccount 是单个 WorkBuddy 账号的额度快照。
 type WorkbuddyQuotaAccount struct {
-	Provider string                  `json:"provider"` // 固定 "workbuddy"
-	Name     string                  `json:"name"`     // 如 "WorkBuddy"
-	Plan     string                  `json:"plan"`     // 如 "Free plan"
-	User     string                  `json:"user"`     // 账号名，如 "小牛来咯"
-	Kind     string                  `json:"kind,omitempty"`
-	ReadAt   string                  `json:"read_at,omitempty"`
-	Windows  []WorkbuddyQuotaWindow  `json:"windows"`
+	Provider string                 `json:"provider"` // 固定 "workbuddy"
+	Name     string                 `json:"name"`     // 如 "WorkBuddy"
+	Plan     string                 `json:"plan"`     // 如 "Free plan"
+	User     string                 `json:"user"`     // 账号名，如 "小牛来咯"
+	Kind     string                 `json:"kind,omitempty"`
+	ReadAt   string                 `json:"read_at,omitempty"`
+	Windows  []WorkbuddyQuotaWindow `json:"windows"`
+	// CheckinKey 是该账号在 Magpie 签到开关里的 key（如 "workbuddy|workbuddy#wycm4m"），
+	// 来自 Magpie GET /api/settings 的 checkinAccounts（按 user 匹配）。
+	// 为空表示未知（后端未配 MAGPIE_WEB_KEY、取不到开关状态），前端此时把调度开关置为只读。
+	CheckinKey string `json:"checkin_key,omitempty"`
+	// CheckinEnabled 是该账号的每日签到开关是否开启。仅当 CheckinKey 非空时有效。
+	CheckinEnabled bool `json:"checkin_enabled"`
+}
+
+// magpieCheckinAccount 是 Magpie GET /api/settings 返回的 checkinAccounts 元素：
+// 单个 WorkBuddy 账号的签到开关（key 用于调 POST /api/settings/checkin-account）。
+type magpieCheckinAccount struct {
+	Key  string `json:"key"`
+	User string `json:"user"`
+	On   bool   `json:"on"`
+}
+
+// magpieSettingsCheckin 只取 Magpie GET /api/settings 里与签到开关有关的字段。
+type magpieSettingsCheckin struct {
+	CheckinAccounts []magpieCheckinAccount `json:"checkinAccounts"`
 }
 
 // WorkbuddyCheckinResult 是 Magpie 一次 WorkBuddy 签到的单个账号结果
@@ -165,10 +187,101 @@ func (s *WorkbuddyQuotaService) fetchAccounts(ctx context.Context) (*WorkbuddyQu
 		}
 		accounts = append(accounts, acc)
 	}
+	// 顺带取各账号的签到开关状态（按 user 名匹配）。取不到也不影响额度本身：
+	// 此时 CheckinKey 为空，前端把调度开关置为只读。
+	if states := s.fetchCheckinStates(ctx); len(states) > 0 {
+		for i := range accounts {
+			if st, ok := states[accounts[i].User]; ok {
+				accounts[i].CheckinKey = st.Key
+				accounts[i].CheckinEnabled = st.On
+			}
+		}
+	}
 	return &WorkbuddyQuotaResult{
 		Accounts:  accounts,
 		FetchedAt: time.Now().Unix(),
 	}, nil
+}
+
+// fetchCheckinStates 从 Magpie GET /api/settings 拉取各 WorkBuddy 账号的签到开关
+// （checkinAccounts：key、user、on），返回按 user 名索引的映射。
+//
+// Best-effort：任何失败（未配 WEB_KEY、Magpie 报错、解析失败）都返回空映射，
+// 调用方不因此失败，只把开关置为只读。WEB_KEY 只放 Cookie，绝不写日志。
+func (s *WorkbuddyQuotaService) fetchCheckinStates(ctx context.Context) map[string]magpieCheckinAccount {
+	baseURL, webKey := s.magpieCheckinEndpoint()
+	if webKey == "" {
+		return nil
+	}
+	endpoint := strings.TrimRight(baseURL, "/") + "/api/settings"
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
+	if err != nil {
+		return nil
+	}
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Cookie", workbuddyWebCookieName+"="+webKey)
+
+	resp, err := s.client.Do(req)
+	if err != nil {
+		return nil
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		return nil
+	}
+	body, err := io.ReadAll(io.LimitReader(resp.Body, workbuddySettingsMaxBodyBytes))
+	if err != nil {
+		return nil
+	}
+	var settings magpieSettingsCheckin
+	if err := json.Unmarshal(body, &settings); err != nil {
+		return nil
+	}
+	states := make(map[string]magpieCheckinAccount, len(settings.CheckinAccounts))
+	for _, acc := range settings.CheckinAccounts {
+		if acc.Key == "" || acc.User == "" {
+			continue
+		}
+		states[acc.User] = acc
+	}
+	return states
+}
+
+// SetCheckinEnabled 开关单个 WorkBuddy 账号的每日签到（调 Magpie Web UI 的
+// POST /api/settings/checkin-account，body {key, on}，Cookie 认证）。
+// 只改该账号是否参与每日签到，不会立即触发一次签到；开关状态实时生效。
+func (s *WorkbuddyQuotaService) SetCheckinEnabled(ctx context.Context, key string, on bool) error {
+	baseURL, webKey := s.magpieCheckinEndpoint()
+	if webKey == "" {
+		return infraerrors.New(http.StatusServiceUnavailable, "WORKBUDDY_CHECKIN_NOT_CONFIGURED", "magpie web key is not configured (set MAGPIE_WEB_KEY)")
+	}
+	if strings.TrimSpace(key) == "" {
+		return infraerrors.New(http.StatusBadRequest, "WORKBUDDY_CHECKIN_KEY_REQUIRED", "checkin account key is required")
+	}
+	endpoint := strings.TrimRight(baseURL, "/") + "/api/settings/checkin-account"
+	payload, _ := json.Marshal(map[string]any{"key": key, "on": on})
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, bytes.NewReader(payload))
+	if err != nil {
+		return infraerrors.Newf(http.StatusInternalServerError, "WORKBUDDY_CHECKIN_TOGGLE_REQUEST_BUILD_FAILED", "build request: %v", err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Cookie", workbuddyWebCookieName+"="+webKey)
+
+	resp, err := s.client.Do(req)
+	if err != nil {
+		return infraerrors.Newf(http.StatusBadGateway, "WORKBUDDY_CHECKIN_TOGGLE_REQUEST_FAILED", "magpie checkin-account request failed: %v", err)
+	}
+	defer resp.Body.Close()
+	// 响应体是整份 Magpie 设置（很大），不解析、不留存，只确认状态码。
+	_, _ = io.Copy(io.Discard, io.LimitReader(resp.Body, workbuddySettingsMaxBodyBytes))
+	if resp.StatusCode == http.StatusUnauthorized || resp.StatusCode == http.StatusForbidden {
+		return infraerrors.New(http.StatusBadGateway, "WORKBUDDY_CHECKIN_AUTH_FAILED", "magpie web key was rejected (401/403)")
+	}
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		return infraerrors.Newf(http.StatusBadGateway, "WORKBUDDY_CHECKIN_TOGGLE_UPSTREAM_ERROR", "magpie checkin-account returned status %d", resp.StatusCode)
+	}
+	return nil
 }
 
 // Checkin 触发一次 Magpie WorkBuddy 签到，覆盖全部已开启的账号（幂等，

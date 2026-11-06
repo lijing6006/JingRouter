@@ -10,6 +10,7 @@ import (
 //
 //   - GET /admin/workbuddy/accounts  全部 WorkBuddy 账号的额度快照
 //   - POST /admin/workbuddy/checkin  触发一次 Magpie WorkBuddy 签到（覆盖全部已开启的账号，幂等）
+//   - POST /admin/workbuddy/checkin-account  单个账号的签到开关（调 Magpie 的签到开关接口）
 //
 // Magpie 网关密钥与 Web 密钥只在后端 service 里使用，前端只调本接口、拿不到密钥。
 type WorkbuddyHandler struct {
@@ -49,4 +50,32 @@ func (h *WorkbuddyHandler) Checkin(c *gin.Context) {
 		return
 	}
 	response.Success(c, results)
+}
+
+// SetCheckinEnabledRequest 是 POST /admin/workbuddy/checkin-account 的请求体：
+// key 为 Magpie 签到开关的账号 key（GET /admin/workbuddy/accounts 返回的
+// checkin_key），on 为开关目标状态。
+type SetCheckinEnabledRequest struct {
+	Key string `json:"key"`
+	On  bool   `json:"on"`
+}
+
+// SetCheckinEnabled 开关单个 WorkBuddy 账号的每日签到（调 Magpie
+// POST /api/settings/checkin-account）。只改该账号是否参与每日签到，
+// 不会立即触发一次签到；开关状态实时生效。
+func (h *WorkbuddyHandler) SetCheckinEnabled(c *gin.Context) {
+	if h == nil || h.quotaService == nil {
+		response.Error(c, 503, "workbuddy quota service is not enabled")
+		return
+	}
+	var req SetCheckinEnabledRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.Error(c, 400, "invalid request body")
+		return
+	}
+	if err := h.quotaService.SetCheckinEnabled(c.Request.Context(), req.Key, req.On); err != nil {
+		response.ErrorFrom(c, err)
+		return
+	}
+	response.Success(c, gin.H{"key": req.Key, "on": req.On})
 }
