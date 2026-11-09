@@ -37,17 +37,17 @@ const (
 // WorkbuddyQuotaWindow 是 Magpie 额度接口返回的单个额度窗口
 // （Credits / Extra credits / Total credits / 各模型 tokens 估算）。
 type WorkbuddyQuotaWindow struct {
-	Name       string  `json:"name"`
-	Used       float64 `json:"used"`
-	Remaining  float64 `json:"remaining"`
-	Limit      float64 `json:"limit"`
-	Display    string  `json:"display,omitempty"`     // 如 "24.88 / 1100"（供应商口径的已用/上限）
-	Unit       string  `json:"unit,omitempty"`        // 如 "credits"
-	Amount     float64 `json:"amount,omitempty"`      // 供应商口径的已用量（与 used 的归一化值不同）
-	ResetsAt   string  `json:"resets_at,omitempty"`   // RFC3339，窗口重置时间
-	RunsOutAt  string  `json:"runs_out_at,omitempty"` // RFC3339，余额耗尽预计时间
-	RunsOut    float64 `json:"runs_out,omitempty"`    // 预计耗尽时的剩余量
-	HoldsWhy   string  `json:"holds_why,omitempty"`   // 额度偏低时的原因标记
+	Name      string  `json:"name"`
+	Used      float64 `json:"used"`
+	Remaining float64 `json:"remaining"`
+	Limit     float64 `json:"limit"`
+	Display   string  `json:"display,omitempty"`     // 如 "24.88 / 1100"（供应商口径的已用/上限）
+	Unit      string  `json:"unit,omitempty"`        // 如 "credits"
+	Amount    float64 `json:"amount,omitempty"`      // 供应商口径的已用量（与 used 的归一化值不同）
+	ResetsAt  string  `json:"resets_at,omitempty"`   // RFC3339，窗口重置时间
+	RunsOutAt string  `json:"runs_out_at,omitempty"` // RFC3339，余额耗尽预计时间
+	RunsOut   float64 `json:"runs_out,omitempty"`    // 预计耗尽时的剩余量
+	HoldsWhy  string  `json:"holds_why,omitempty"`   // 额度偏低时的原因标记
 }
 
 // WorkbuddyQuotaAccount 是单个 WorkBuddy 账号的额度快照。
@@ -81,7 +81,7 @@ type magpieSettingsCheckin struct {
 }
 
 // WorkbuddyCheckinResult 是 Magpie 一次 WorkBuddy 签到的单个账号结果
-//（POST /api/usage/plugin-checkin 返回的数组元素；只取展示需要的字段）。
+// （POST /api/usage/plugin-checkin 返回的数组元素；只取展示需要的字段）。
 // Outcome 取值与 Magpie 一致：claimed（本次领到）、done（今日已签）、
 // ineligible（不符合条件）、inactive（当前无签到活动）、captcha（需验证码）、
 // own-app（需去 WorkBuddy App 内签）、failed（失败，原因见 Msg）。
@@ -99,7 +99,7 @@ type WorkbuddyCheckinResult struct {
 // WorkbuddyQuotaResult 是 GET /admin/workbuddy/accounts 的返回结构。
 type WorkbuddyQuotaResult struct {
 	Accounts  []WorkbuddyQuotaAccount `json:"accounts"`
-	FetchedAt int64                  `json:"fetched_at"` // Unix 秒，本次拉取时间
+	FetchedAt int64                   `json:"fetched_at"` // Unix 秒，本次拉取时间
 }
 
 // workbuddyQuotasResponse 是 Magpie GET /v1/magpie/quotas 的原始返回（只取 data）。
