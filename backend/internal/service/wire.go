@@ -914,6 +914,7 @@ var ProviderSet = wire.NewSet(
 	ProvideGrokQuotaService,
 	ProvideCNProviderQuotaService,
 	ProvideCNProviderBalanceService,
+	ProvideWorkbuddyQuotaService,
 	ProvideCNProviderBalanceCheckService,
 	ProvideClaudeTokenProvider,
 	NewAntigravityGatewayService,

@@ -197,6 +197,7 @@ import Icon from '@/components/icons/Icon.vue'
 import { sanitizeSvg } from '@/utils/sanitize'
 import { sanitizeUrl } from '@/utils/url'
 import { FeatureFlags, makeSidebarFlag } from '@/utils/featureFlags'
+import { isAdminMenuVisible } from '@/utils/adminMenuVisibility'
 import { resolveSiteBillingMode } from '@/utils/siteBillingMode'
 import { useBatchImageAccess } from '@/composables/useBatchImageAccess'
 
@@ -219,6 +220,11 @@ interface NavItem {
    * 开关切换时菜单自动更新。
    */
   featureFlag?: () => boolean | undefined
+  /**
+   * 后台「菜单显示」配置对应的键（见 utils/adminMenuVisibility）。
+   * 未设置时不受该配置影响；「系统设置」本身没有 menuKey，永远显示。
+   */
+  menuKey?: string
 }
 
 // applyFeatureFlags 递归过滤掉 featureFlag() === false 的节点（含子节点）。
@@ -234,6 +240,13 @@ function applyFeatureFlags(items: NavItem[]): NavItem[] {
     }
   }
   return out
+}
+
+// applyMenuVisibility 按「系统设置 → 菜单显示」过滤一级菜单：
+// menuKey 在配置里显式为 false 时整项隐藏（含子菜单）；没有 menuKey 的项
+// （如「系统设置」）永远保留。只做显示隐藏，不拦截路由。
+function applyMenuVisibility(items: NavItem[], visibility: Record<string, boolean>): NavItem[] {
+  return items.filter((item) => item.menuKey === undefined || isAdminMenuVisible(visibility, item.menuKey))
 }
 
 const { t } = useI18n()
@@ -781,27 +794,29 @@ const customMenuItemsForAdmin = computed(() => {
 // Admin navigation items
 const adminNavItems = computed((): NavItem[] => {
   const baseItems: NavItem[] = [
-    { path: '/admin/dashboard', label: t('nav.dashboard'), icon: DashboardIcon },
-    { path: '/admin/ops', label: t('nav.ops'), icon: ChartIcon, featureFlag: flagOpsMonitoring },
-    { path: '/admin/users', label: t('nav.users'), icon: UsersIcon, hideInSimpleMode: true },
-    { path: '/admin/groups', label: t('nav.groups'), icon: FolderIcon },
+    { path: '/admin/dashboard', label: t('nav.dashboard'), icon: DashboardIcon, menuKey: 'dashboard' },
+    { path: '/admin/ops', label: t('nav.ops'), icon: ChartIcon, featureFlag: flagOpsMonitoring, menuKey: 'ops' },
+    { path: '/admin/users', label: t('nav.users'), icon: UsersIcon, hideInSimpleMode: true, menuKey: 'users' },
+    { path: '/admin/groups', label: t('nav.groups'), icon: FolderIcon, menuKey: 'groups' },
     {
       path: '/admin/channels',
       label: t('nav.channelManagement'),
       icon: ChannelIcon,
       hideInSimpleMode: true,
       expandOnly: true,
+      menuKey: 'channels',
       children: [
         { path: '/admin/channels/pricing', label: t('nav.channelPricing'), icon: PriceTagIcon },
         { path: '/admin/channels/monitor', label: t('nav.channelMonitor'), icon: SignalIcon, featureFlag: flagChannelMonitor },
       ],
     },
     // 「仅充值」站点连管理端的「订阅管理」入口也一并收起（路由本身不拦截）。
-    { path: '/admin/subscriptions', label: t('nav.subscriptions'), icon: CreditCardIcon, hideInSimpleMode: true, featureFlag: flagSubscription },
-    { path: '/admin/accounts', label: t('nav.accounts'), icon: GlobeIcon },
+    { path: '/admin/subscriptions', label: t('nav.subscriptions'), icon: CreditCardIcon, hideInSimpleMode: true, featureFlag: flagSubscription, menuKey: 'subscriptions' },
+    { path: '/admin/accounts', label: t('nav.accounts'), icon: GlobeIcon, menuKey: 'accounts' },
+    { path: '/admin/workbuddy', label: t('nav.workbuddy'), icon: CreditCardIcon, menuKey: 'workbuddy' },
     { path: '/admin/plugins', label: t('nav.plugins'), icon: PluginIcon, featureFlag: flagPluginManagement },
-    { path: '/admin/announcements', label: t('nav.announcements'), icon: BellIcon },
-    { path: '/admin/proxies', label: t('nav.proxies'), icon: ServerIcon },
+    { path: '/admin/announcements', label: t('nav.announcements'), icon: BellIcon, menuKey: 'announcements' },
+    { path: '/admin/proxies', label: t('nav.proxies'), icon: ServerIcon, menuKey: 'proxies' },
     {
       path: '/admin/security-audit',
       label: t('nav.securityAudit'),
@@ -813,8 +828,8 @@ const adminNavItems = computed((): NavItem[] => {
         { path: '/admin/prompt-audit', label: t('nav.promptAudit'), icon: ShieldIcon },
       ],
     },
-    { path: '/admin/redeem', label: t('nav.redeemCodes'), icon: TicketIcon, hideInSimpleMode: true },
-    { path: '/admin/promo-codes', label: t('nav.promoCodes'), icon: GiftIcon, hideInSimpleMode: true },
+    { path: '/admin/redeem', label: t('nav.redeemCodes'), icon: TicketIcon, hideInSimpleMode: true, menuKey: 'redeem' },
+    { path: '/admin/promo-codes', label: t('nav.promoCodes'), icon: GiftIcon, hideInSimpleMode: true, menuKey: 'promo-codes' },
     {
       path: '/admin/affiliates',
       label: t('nav.affiliateManagement'),
@@ -835,17 +850,19 @@ const adminNavItems = computed((): NavItem[] => {
       hideInSimpleMode: true,
       expandOnly: true,
       featureFlag: flagAdminPayment,
+      menuKey: 'orders',
       children: [
         { path: '/admin/orders/dashboard', label: t('nav.paymentDashboard'), icon: ChartIcon },
         { path: '/admin/orders', label: t('nav.orderManagement'), icon: OrderIcon },
         { path: '/admin/orders/plans', label: t('nav.paymentPlans'), icon: CreditCardIcon },
       ],
     },
-    { path: '/admin/usage', label: t('nav.usage'), icon: ChartIcon },
-    { path: '/admin/audit-logs', label: t('nav.auditLogs'), icon: ShieldIcon, hideInSimpleMode: true }
+    { path: '/admin/usage', label: t('nav.usage'), icon: ChartIcon, menuKey: 'usage' },
+    { path: '/admin/audit-logs', label: t('nav.auditLogs'), icon: ShieldIcon, hideInSimpleMode: true, menuKey: 'audit-logs' }
   ]
 
-  const visible = applyFeatureFlags(baseItems)
+  // 先过功能开关，再过「菜单显示」配置；「系统设置」没有 menuKey，永远保留。
+  const visible = applyMenuVisibility(applyFeatureFlags(baseItems), adminSettingsStore.adminMenuVisibility)
 
   // 简单模式下，在系统设置前插入 API密钥
   if (authStore.isSimpleMode) {

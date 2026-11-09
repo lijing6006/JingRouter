@@ -19,6 +19,7 @@ import geminiAPI from './gemini'
 import antigravityAPI from './antigravity'
 import grokAPI from './grok'
 import cnProvidersAPI from './cnProviders'
+import workbuddyAPI from './workbuddy'
 import userAttributesAPI from './userAttributes'
 import opsAPI from './ops'
 import errorPassthroughAPI from './errorPassthrough'
@@ -57,6 +58,7 @@ export const adminAPI = {
   antigravity: antigravityAPI,
   grok: grokAPI,
   cnProviders: cnProvidersAPI,
+  workbuddy: workbuddyAPI,
   userAttributes: userAttributesAPI,
   ops: opsAPI,
   errorPassthrough: errorPassthroughAPI,
@@ -93,6 +95,7 @@ export {
   antigravityAPI,
   grokAPI,
   cnProvidersAPI,
+  workbuddyAPI,
   userAttributesAPI,
   opsAPI,
   errorPassthroughAPI,
@@ -115,6 +118,7 @@ export {
 export default adminAPI
 
 // Re-export types used by components
+export type { WorkbuddyQuotaWindow, WorkbuddyQuotaAccount, WorkbuddyQuotaResult, WorkbuddyCheckinResult } from './workbuddy'
 export type { AuditLog, AuditLogQuery, AuditLogListResponse } from './audit'
 export type { BalanceHistoryItem } from './users'
 export type { ErrorPassthroughRule, CreateRuleRequest, UpdateRuleRequest } from './errorPassthrough'

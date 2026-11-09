@@ -163,6 +163,7 @@ type SystemSettings struct {
 	TableDefaultPageSize        int              `json:"table_default_page_size"`
 	TablePageSizeOptions        []int            `json:"table_page_size_options"`
 	CustomMenuItems             []CustomMenuItem `json:"custom_menu_items"`
+	AdminMenuVisibility         map[string]bool  `json:"admin_menu_visibility"`
 	CustomEndpoints             []CustomEndpoint `json:"custom_endpoints"`
 
 	DefaultConcurrency           int                          `json:"default_concurrency"`
@@ -605,6 +606,61 @@ func ParseCustomMenuItems(raw string) []CustomMenuItem {
 		return []CustomMenuItem{}
 	}
 	return items
+}
+
+// allowedAdminMenuVisibilityKeys 是后台「菜单显示」可配置的一级菜单 key。
+// 「settings」（系统设置）不在其中：它永远显示，服务端同样拒绝写入。
+var allowedAdminMenuVisibilityKeys = map[string]bool{
+	"dashboard":     true,
+	"ops":           true,
+	"users":         true,
+	"groups":        true,
+	"channels":      true,
+	"subscriptions": true,
+	"accounts":      true,
+	"workbuddy":     true,
+	"announcements": true,
+	"proxies":       true,
+	"redeem":        true,
+	"promo-codes":   true,
+	"orders":        true,
+	"usage":         true,
+	"audit-logs":    true,
+}
+
+// SanitizeAdminMenuVisibility 只保留已知菜单 key；未知 key 与 "settings" 一律丢弃。
+func SanitizeAdminMenuVisibility(m map[string]bool) map[string]bool {
+	out := make(map[string]bool, len(m))
+	for key, value := range m {
+		if allowedAdminMenuVisibilityKeys[key] {
+			out[key] = value
+		}
+	}
+	return out
+}
+
+// ParseAdminMenuVisibility parses a JSON string into a menu visibility map.
+// Returns an empty map on empty/invalid input (all menus visible).
+func ParseAdminMenuVisibility(raw string) map[string]bool {
+	raw = strings.TrimSpace(raw)
+	if raw == "" || raw == "{}" {
+		return map[string]bool{}
+	}
+	var m map[string]bool
+	if err := json.Unmarshal([]byte(raw), &m); err != nil {
+		return map[string]bool{}
+	}
+	return SanitizeAdminMenuVisibility(m)
+}
+
+// MarshalAdminMenuVisibility serializes a menu visibility map to JSON.
+// Invalid input yields "{}".
+func MarshalAdminMenuVisibility(m map[string]bool) string {
+	raw, err := json.Marshal(SanitizeAdminMenuVisibility(m))
+	if err != nil {
+		return "{}"
+	}
+	return string(raw)
 }
 
 // ParseUserVisibleMenuItems parses custom menu items and filters out admin-only entries.

@@ -66,6 +66,9 @@ func RegisterAdminRoutes(
 		// 国产供应商（kimi/zhipu/deepseek）额度与余额
 		registerCNProviderRoutes(admin, h)
 
+		// WorkBuddy 账号额度（数据来自本地 Magpie 网关）
+		registerWorkbuddyRoutes(admin, h)
+
 		// 代理管理
 		registerProxyRoutes(admin, h, stepUpAuth)
 
@@ -517,6 +520,19 @@ func registerCNProviderRoutes(admin *gin.RouterGroup, h *handler.Handlers) {
 		cn.GET("/accounts/:id/quota", h.Admin.CNProvider.QueryQuota)
 		// payg 账号余额（kimi/deepseek；zhipu 无余额端点）。
 		cn.GET("/accounts/:id/balance", h.Admin.CNProvider.QueryBalance)
+	}
+}
+
+// registerWorkbuddyRoutes 注册 WorkBuddy 账号额度查询与签到端点（数据来自本地 Magpie 网关）。
+func registerWorkbuddyRoutes(admin *gin.RouterGroup, h *handler.Handlers) {
+	wb := admin.Group("/workbuddy")
+	{
+		// 全部 WorkBuddy 账号的额度快照（账号、套餐、各额度窗口的已用/剩余/上限/到期时间）。
+		wb.GET("/accounts", h.Admin.Workbuddy.ListAccounts)
+		// 触发一次 Magpie WorkBuddy 签到（覆盖全部已开启的账号，幂等）。
+		wb.POST("/checkin", h.Admin.Workbuddy.Checkin)
+		// 单个 WorkBuddy 账号的签到开关（调 Magpie POST /api/settings/checkin-account）。
+		wb.POST("/checkin-account", h.Admin.Workbuddy.SetCheckinEnabled)
 	}
 }
 
