@@ -23,9 +23,10 @@ function initIOSViewportZoomFix() {
 }
 
 function initThemeClass() {
-  // 站点强制浅色主题：不跟随系统偏好，也不读取已保存的深色偏好，所有人进入均为白色。
-  localStorage.setItem('theme', 'light')
-  document.documentElement.classList.remove('dark')
+  // 默认浅色：无保存偏好时为白色，不跟随系统；只有用户手动切过深色才用深色。
+  const savedTheme = localStorage.getItem('theme')
+  const shouldUseDark = savedTheme === 'dark'
+  document.documentElement.classList.toggle('dark', shouldUseDark)
 }
 
 async function bootstrap() {
